@@ -1,0 +1,31 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.16.3",
+    "phantomjs-prebuilt": "^2.1.16",
+    "selenium-webdriver": "^4.0.0-alpha.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-root-import": "^6.1.0",
+    "babel-plugin-transform-builtin-extend": "^1.1.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "jest": "^23.4.2"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "babel src -d lib --source-maps --sourceMaps inline --retainLines",
+    "run": "node lib/index.js",
+    "watch": "babel src -d lib --watch"
+  },
+  "author": "",
+  "license": "ISC"
+}

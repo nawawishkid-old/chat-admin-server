@@ -1,0 +1,8 @@
+{
+  "presets": ["env"],
+  "plugins": [
+    "transform-class-properties",
+    "root-import",
+    "transform-builtin-extend"
+  ]
+}
