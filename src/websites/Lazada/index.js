@@ -6,22 +6,16 @@ import page from "./pages/index";
 class Lazada extends WebSite {
   constructor(driver) {
     super(driver);
-    
+
     this.pages = {
       SignUp: page.SignUpPage
     };
   }
 
-//  get pages() {
-//    return {
-//      SignUp: page.SignUpPage
-//    };
-//  }
-
-  signUp = () => {
+  signUp = (...params) => {
     // console.log(this.pages.SignUp);
     const page = new this.pages.SignUp(this.driver);
-    return page.signUp();
+    return page.signUp(...params);
   };
 }
 

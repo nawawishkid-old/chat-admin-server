@@ -1,5 +1,9 @@
 import { ThenableWebDriver, By } from "selenium-webdriver";
 import { IncompatibleException } from "~/src/Exception/index";
+import Task from "~/src/Task/Task";
+import fs from "fs";
+import logger from "~/src/Logger/index";
+import tasks from "./tasks/index";
 
 class Page {
   /**
@@ -46,88 +50,175 @@ class Page {
     this.name = name;
     this.url = url;
     this.driver = driver;
+    this.task = {
+      findElement: tasks.findElement
+      // ...tasks
+    };
   }
 
   load = async () => {
+    // logger.info("Page.load()");
     if (this.init && this.isClosed) {
-      console.log("Page has already closed, no driver to return.");
+      // logger.info("Page has already closed, no driver to return.");
       return;
     }
 
     if (this.isLoaded) {
-      console.log("Page has already loaded, return the driver");
+      // logger.info("Page has already loaded, return the driver");
       return this.driver;
     }
 
     this.isClosed = false;
     this.init = true;
 
-    console.log("Loding page...");
+    logger.info(`Loading page from ${this.url}`);
 
     return await this.driver
       .get(this.url)
       .then(() => {
-        console.log("Page loaded.");
+        logger.info("Page loaded.");
         this.isLoaded = true;
         this.checkCompatibility();
       })
-      .catch(err => console.log("Failed to get page!", err));
+      .catch(err => {
+        logger.info(`FAILD: Could not get page from given url:${this.url}`);
+        return err;
+      });
   };
 
   /**
    * Check if the HTML of the page still valid.
    */
   checkCompatibility = () => {
-    console.log("Checking HTML compatibility...");
+    logger.info("Checking HTML compatibility...");
 
     try {
-      // console.log('isCompatible: ', this.isCompatible());
+      // logger.info('isCompatible: ', this.isCompatible());
       if (!this.isCompatible()) {
         throw new IncompatibleException(
           `The page '${this.name}' is incompatible with your code.`
         );
       }
     } catch (error) {
-      console.log("This is error: ", error);
+      logger.info("This is error: ", error);
 
       this.close();
     }
 
-    console.log("Page is compatible.");
-    console.log("Start performing page's action...");
+    logger.info("Page is compatible.");
+    logger.info("Start performing page's action...");
 
     return true;
   };
 
   isCompatible = () => {
-    return Object.values(this.elementSelectors).every(this.elementExists);
+    // logger.info("Page.isCompatible()");
+    return Object.values(this.elementSelectors).every(async selector => {
+      return await this.elementExists(selector);
+    });
   };
 
-  selfie = () => {
-    return this.load().takeScreenshot();
+  selfie = async () => {
+    // logger.info("Page.selfie()");
+    logger.info("Taking page screenshot...");
+    await this.load();
+
+    return await this.driver.takeScreenshot().then((img, err) => {
+      logger.info(`Image base64 first 100 chars: ${img.substr(0, 100)}`);
+      fs.writeFile(
+        `./storage/Lazada/screenshots/${Date.now()}.png`,
+        img,
+        "base64",
+        err => logger.info("FileSystem Callback: ", err)
+      );
+    });
   };
 
   close = () => {
-    console.log("Closing page...");
+    logger.info("Closing page...");
 
     this.isClosed = true;
 
-    console.log("Page closed.");
+    logger.info("Page closed.");
   };
 
   elementExists = async selector => {
-    return await this.load()
+    // logger.info("Page.elementExists()");
+    logger.debug(`Finding HTML element using CSS selector: '${selector}'.`);
+
+    return await this.driver
       .findElements(By.css(selector))
-      .then(() => true)
-      .catch(() => false);
+      .then(() => {
+        logger.debug("SUCCESS: Element found.");
+        return true;
+      })
+      .catch(() => {
+        logger.debug("FAILED: Element not found.");
+        return false;
+      });
   };
 
   getElement = async name => {
-    const driver = await this.load();
-    console.log("Driver: ", driver);
-    return driver
-      .findElements(By.css(this.elementSelectors[name]))
-      .catch(() => console.log("Error: could not find element"));
+    // logger.info("Page.getElement()");
+    await this.load();
+
+    const selector = this.elementSelectors[name];
+    const callback = async selector => {
+      return await this.driver.findElement(By.css(selector));
+      // .then(element => {
+      //   logger.debug("SUCCESS: Got and return element.");
+      //   return element;
+      // })
+      // .catch(err => {
+      //   logger.error(`FAILED: Could not find element using '${selector}'.`);
+      //   return err;
+      // });
+    };
+    const options = {
+      retries: 3,
+      retryAfter: 2000
+      // onSuccess: elem => {
+      //   logger.debug("SUCCESS: Got and return element.");
+      //   return elem;
+      // },
+      // onFailed: err => {
+      //   logger.error(`FAILED: Could not find element using '${selector}'.`);
+      //   return err;
+      // }
+    };
+    const task = new Task(callback, options);
+
+    // task.onSuccess(elem => {
+    //   logger.debug("SUCCESS: Got and return element.");
+    //   return elem;
+    // });
+
+    // task.onFailed(err => {
+    //   logger.error(`FAILED: Could not find element using '${selector}'.`);
+    //   return err;
+    // });
+
+    return await task
+      .perform(selector)
+      .then(elem => {
+        logger.debug("SUCCESS: Got and return element.");
+        return elem;
+      })
+      .catch(err => {
+        logger.error(`FAILED: Could not find element using '${selector}'.`);
+        return err;
+      });
+
+    // return await this.driver
+    //   .findElement(By.css(selector))
+    //   .then(element => {
+    //     logger.debug("SUCCESS: Got and return element.");
+    //     return element;
+    //   })
+    //   .catch(err => {
+    //     logger.error(`FAILED: Could not find element using '${selector}'.`);
+    //     return err;
+    //   });
   };
 }
 

@@ -3,6 +3,7 @@
   "plugins": [
     "transform-class-properties",
     "root-import",
-    "transform-builtin-extend"
+    "transform-builtin-extend",
+    "transform-object-rest-spread"
   ]
 }

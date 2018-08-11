@@ -16,40 +16,35 @@ class SignUpPage extends Page {
   }
 
   signUp = async (fullName, email, password) => {
-    const fullNameInput = await this.getElement("fullName");
-    const emailInput = await this.getElement("email");
-    const passwordInput = await this.getElement("password");
-    const rePasswordInput = await this.getElement("repassword");
-    const submitBtn = await this.getElement("submit");
+    await this.load();
 
-    fullNameInput.sendKeys(fullName);
-    emailInput.sendKeys(email);
-    passwordInput.sendKeys(password);
-    rePasswordInput.sendKeys(password);
+    console.log('findElem: ', this.task.findElement);
 
-    const screenshot = await this.load()
-      .takeScreenshot()
-      .catch(err => console.log("Error: could not take screenshot", err));
+    const elem = await this.task.findElement
+      .config({ retries: 3, retryAfter: 500 })
+      .perform(this.driver, this.elementSelectors.fullName);
 
-    console.log("Screenshot: ", screenshot);
-    // submitBtn.click();
+    console.log('ELEM: ', elem);
 
-    // return await this.load().then(async () => {
-    //   console.log("Authenticating page...");
+    // const fullNameInput = await this.getElement("fullName").then(elem =>
+    //   elem.sendKeys(fullName)
+    // );
+    // .catch(err =>
+    //   console.log("ERROR: ", err)
+    // );
+    // const emailInput = await this.getElement("email");
+    // const passwordInput = await this.getElement("password");
+    // const rePasswordInput = await this.getElement("repassword");
+    // const submitBtn = await this.getElement("submit");
 
-    //   const element = await this.driver
-    //     .findElement(By.css(this.elementSelectors.submit))
-    //     .then(() => {
-    //       console.log("Page authenticated.");
-    //       return true;
-    //     })
-    //     .catch(err => {
-    //    	  console.log("Page unauthenticated.");
-    //       return false;
-    //     });
-
-    //   console.log(element);
-    // });
+    // await Promise.all([
+    //   fullNameInput.sendKeys(fullName)
+    //   emailInput.sendKeys(email),
+    //   passwordInput.sendKeys(password),
+    //   rePasswordInput.sendKeys(password)
+    // ])
+    //   .then(async value => await this.selfie())
+    //   .catch(err => console.log(err));
 
     this.close();
   };
