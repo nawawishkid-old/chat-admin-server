@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -14,7 +14,7 @@ var BaseException = function (_Error) {
   _inherits(BaseException, _Error);
 
   function BaseException(name) {
-    var _console, _ref;
+    var _ref;
 
     _classCallCheck(this, BaseException);
 
@@ -22,10 +22,10 @@ var BaseException = function (_Error) {
       params[_key - 1] = arguments[_key];
     }
 
-    (_console = console).log.apply(_console, ['Params: '].concat(params));
+    var _this = _possibleConstructorReturn(this, (_ref = BaseException.__proto__ || Object.getPrototypeOf(BaseException)).call.apply(_ref, [this].concat(params)));
+    // console.log('Params: ', ...params);
     // Pass remaining arguments (including vendor specific ones) to parent constructor
 
-    var _this = _possibleConstructorReturn(this, (_ref = BaseException.__proto__ || Object.getPrototypeOf(BaseException)).call.apply(_ref, [this].concat(params)));
 
     _this.name = name;
 

@@ -1,8 +1,9 @@
 import { ThenableWebDriver, By } from "selenium-webdriver";
+import { NoSuchElementError } from "selenium-webdriver/lib/error";
 import { IncompatibleException } from "~/src/Exception/index";
 import Task from "~/src/Task/Task";
 import fs from "fs";
-import logger from "~/src/Logger/index";
+import logger from "~/src/Logger/page";
 import tasks from "./tasks/index";
 
 class Page {
@@ -51,7 +52,8 @@ class Page {
     this.url = url;
     this.driver = driver;
     this.task = {
-      findElement: tasks.findElement
+      findElement: tasks.findElement,
+      sendKeys: tasks.sendKeys
       // ...tasks
     };
   }
@@ -75,13 +77,13 @@ class Page {
 
     return await this.driver
       .get(this.url)
-      .then(() => {
+      .then(async () => {
         logger.info("Page loaded.");
         this.isLoaded = true;
-        this.checkCompatibility();
+        await this.checkCompatibility();
       })
       .catch(err => {
-        logger.info(`FAILD: Could not get page from given url:${this.url}`);
+        logger.info(`FAILED: Could not get page from given url:${this.url}`);
         return err;
       });
   };
@@ -89,20 +91,27 @@ class Page {
   /**
    * Check if the HTML of the page still valid.
    */
-  checkCompatibility = () => {
+  checkCompatibility = async () => {
     logger.info("Checking HTML compatibility...");
 
+    const isCompatible = await this.isCompatible();
+
+    // console.log("compat: ", isCompatible);
+
     try {
-      // logger.info('isCompatible: ', this.isCompatible());
-      if (!this.isCompatible()) {
+      if (!isCompatible) {
         throw new IncompatibleException(
-          `The page '${this.name}' is incompatible with your code.`
+          `The page '${
+            this.name
+          }' has incompatible HTML structure with given selector.`
         );
       }
     } catch (error) {
-      logger.info("This is error: ", error);
+      logger.error(error.message);
 
       this.close();
+
+      return;
     }
 
     logger.info("Page is compatible.");
@@ -111,11 +120,24 @@ class Page {
     return true;
   };
 
-  isCompatible = () => {
+  /**
+   * Implement Array.prototype.every() on Object asynchronously.
+   */
+  isCompatible = async () => {
     // logger.info("Page.isCompatible()");
-    return Object.values(this.elementSelectors).every(async selector => {
-      return await this.elementExists(selector);
-    });
+    const selectors = this.elementSelectors;
+
+    for (let key in selectors) {
+      if (!selectors.hasOwnProperty(key)) {
+        continue;
+      }
+
+      if (!(await this.elementExists(selectors[key]))) {
+        return false;
+      }
+    }
+
+    return true;
   };
 
   selfie = async () => {
@@ -148,12 +170,16 @@ class Page {
 
     return await this.driver
       .findElements(By.css(selector))
-      .then(() => {
+      .then(elems => {
+        if (elems.length === 0) {
+          throw new NoSuchElementError(`No such element: '${selector}'.`);
+        }
+
         logger.debug("SUCCESS: Element found.");
         return true;
       })
-      .catch(() => {
-        logger.debug("FAILED: Element not found.");
+      .catch(err => {
+        logger.debug(`FAILED: ${err.message}`);
         return false;
       });
   };

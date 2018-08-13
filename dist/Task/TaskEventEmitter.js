@@ -67,22 +67,6 @@ var TaskEventEmitter = function (_EventEmitter) {
    *
    *
    * @api
-   * @returns {Task}
-   */
-
-
-  /**
-   *
-   *
-   * @api
-   * @returns {Task}
-   */
-
-
-  /**
-   *
-   *
-   * @api
    * @returns {*}
    */
 
@@ -90,25 +74,23 @@ var TaskEventEmitter = function (_EventEmitter) {
   /**
    * ===== Utils =====
    */
-
+  //  _mayCall = (callback, ...rest) => {
+  //    if (this._shouldCall(callback)) {
+  //      return callback(...rest);
+  //    }
+  //
+  //    return null;
+  //  };
+  //
+  //  _shouldCall = callback => {
+  //    return typeof callback === "function";
+  //  };
 
   return TaskEventEmitter;
 }(_events2.default);
 
 var _initialiseProps = function _initialiseProps() {
   var _this2 = this;
-
-  this.onFailed = function (callback) {
-    _this2.options.onFailed = callback;
-
-    return _this2;
-  };
-
-  this.onSuccess = function (callback) {
-    _this2.options.onSuccess = callback;
-
-    return _this2;
-  };
 
   this.config = function (options) {
     _this2.options = _extends({}, _this2.options, options);
@@ -296,22 +278,6 @@ var _initialiseProps = function _initialiseProps() {
       }
     }, _callee5, _this2);
   }));
-
-  this._mayCall = function (callback) {
-    for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      rest[_key2 - 1] = arguments[_key2];
-    }
-
-    if (_this2._shouldCall(callback)) {
-      return callback.apply(undefined, rest);
-    }
-
-    return null;
-  };
-
-  this._shouldCall = function (callback) {
-    return typeof callback === "function";
-  };
 
   this._wrapWithPromise = function (callback) {
     return Promise.resolve(callback);

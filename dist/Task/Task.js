@@ -4,13 +4,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _index = require("../Logger/index");
+var _events = require("events");
 
-var _index2 = _interopRequireDefault(_index);
+var _task = require("../Logger/task");
+
+var _task2 = _interopRequireDefault(_task);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20,87 +20,89 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/**
- * Should have 'within' options
- * Should extends Node's EventEmitter class
- */
-var Task = function Task(callback) {
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-  _classCallCheck(this, Task);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-  _initialiseProps.call(this);
+var Task = function (_EventEmitter) {
+  _inherits(Task, _EventEmitter);
 
-  this.promiseTaskCallback = this._wrapWithPromise(callback);
-  this.options = _extends({
-    retries: 0,
-    retryAfter: 0,
-    retryEvery: 0,
-    alwaysThrow: false
-  }, options);
-  this.state = {
-    retried: 0,
-    isFailed: false,
-    isSuccess: false
-  };
-}
+  function Task(callback) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-/**
- *
- *
- * @api
- * @returns {Task}
- */
+    _classCallCheck(this, Task);
 
+    var _this = _possibleConstructorReturn(this, (Task.__proto__ || Object.getPrototypeOf(Task)).call(this));
 
-/**
- *
- *
- * @api
- * @returns {Task}
- */
+    _initialiseProps.call(_this);
 
+    _this.promiseTaskCallback = _this._wrapWithPromise(callback);
+    _this.options = _extends({
+      title: "Untitled",
+      description: "No description",
+      retries: 0,
+      retryAfter: 0,
+      retryEvery: 0,
+      alwaysThrow: false,
+      exitOnFailed: false
+    }, options);
+    _this.state = {
+      retried: 0,
+      isFailed: false,
+      isSuccess: false
+    };
+    _this.logger = function (level, msg) {
+      return _task2.default.log(level, "#" + _this.options.title + " -- " + msg);
+    };
+    return _this;
+  }
 
-/**
- *
- *
- * @api
- * @returns {Task}
- */
+  /**
+   *
+   *
+   * @api
+   * @returns {Task}
+   */
 
 
-/**
- *
- *
- * @api
- * @returns {*}
- */
+  /**
+   *
+   *
+   * @api
+   * @returns {*}
+   */
 
 
-/**
- * ===== Utils =====
- */
-;
+  /**
+   * EventEmitter's emit method wrapper
+   */
+
+
+  /**
+   * ===== Utils =====
+   */
+  //  _mayCall = (callback, ...rest) => {
+  //    if (this._shouldCall(callback)) {
+  //      return callback(...rest);
+  //    }
+  //
+  //    return null;
+  //  };
+  //
+  //  _shouldCall = callback => {
+  //    return typeof callback === "function";
+  //  };
+
+  return Task;
+}(_events.EventEmitter);
 
 var _initialiseProps = function _initialiseProps() {
-  var _this = this;
-
-  this.onFailed = function (callback) {
-    _this.options.onFailed = callback;
-
-    return _this;
-  };
-
-  this.onSuccess = function (callback) {
-    _this.options.onSuccess = callback;
-
-    return _this;
-  };
+  var _this2 = this;
 
   this.config = function (options) {
-    _this.options = _extends({}, _this.options, options);
+    _this2.options = _extends({}, _this2.options, options);
 
-    return _this;
+    return _this2;
   };
 
   this.perform = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
@@ -112,14 +114,14 @@ var _initialiseProps = function _initialiseProps() {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _index2.default.debug("_PERFORM");
+            _this2.logger("debug", "Task.perform()");
 
-            _this.params = params;
+            _this2.params = params;
 
             _context.next = 4;
-            return _this.promiseTaskCallback.then(function (func) {
+            return _this2.promiseTaskCallback.then(function (func) {
               return func.apply(undefined, _toConsumableArray(params));
-            }).then(_this._success).catch(_this._unsuccess);
+            }).then(_this2._success).catch(_this2._unsuccess);
 
           case 4:
             return _context.abrupt("return", _context.sent);
@@ -129,17 +131,25 @@ var _initialiseProps = function _initialiseProps() {
             return _context.stop();
         }
       }
-    }, _callee, _this);
+    }, _callee, _this2);
   }));
 
+  this._trigger = function (event) {
+    for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
+    return _this2.emit.apply(_this2, [event, _this2].concat(args));
+  };
+
   this._success = function (result) {
-    var onSuccessValue = _this._mayCall(_this.options.onSuccess, result);
+    _this2.logger("debug", "Task._success()");
+    // this.logger('debug', "Success result: ", typeof result);
 
-    _index2.default.debug("_SUCCESS");
-    _index2.default.debug("Success result: ", typeof result === "undefined" ? "undefined" : _typeof(result));
-    _this.state.isSuccess = true;
+    _this2._trigger("success", result);
+    _this2.state.isSuccess = true;
 
-    return onSuccessValue === null ? result : onSuccessValue;
+    return result;
   };
 
   this._unsuccess = function () {
@@ -148,30 +158,32 @@ var _initialiseProps = function _initialiseProps() {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              _index2.default.debug("_UNSUCCESS");
+              _this2.logger("debug", "Task._unsuccess()");
 
-              if (!(_this.options.retries < 1)) {
-                _context2.next = 4;
+              _this2._trigger("unsuccess", err);
+
+              if (!(_this2.options.retries < 1)) {
+                _context2.next = 5;
                 break;
               }
 
-              _index2.default.debug("No retry.");
+              _this2.logger("debug", "No retry.");
 
-              return _context2.abrupt("return", _this._failed(err));
+              return _context2.abrupt("return", _this2._failed(err));
 
-            case 4:
-              _context2.next = 6;
-              return _this._retry(err);
-
-            case 6:
-              return _context2.abrupt("return", _context2.sent);
+            case 5:
+              _context2.next = 7;
+              return _this2._retry(err);
 
             case 7:
+              return _context2.abrupt("return", _context2.sent);
+
+            case 8:
             case "end":
               return _context2.stop();
           }
         }
-      }, _callee2, _this);
+      }, _callee2, _this2);
     }));
 
     return function (_x2) {
@@ -185,35 +197,37 @@ var _initialiseProps = function _initialiseProps() {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              _index2.default.debug("_RETRY");
+              _this2.logger("debug", "Task._retry()");
 
-              if (!(_this.state.retried >= _this.options.retries)) {
+              if (!(_this2.state.retried >= _this2.options.retries)) {
                 _context4.next = 4;
                 break;
               }
 
-              _index2.default.debug("Maximum retry reached.");
-              return _context4.abrupt("return", _this._failed(err));
+              _this2.logger("debug", "Maximum retry reached.");
+              return _context4.abrupt("return", _this2._failed(err));
 
             case 4:
 
-              _this.state.retried++;
+              _this2.state.retried++;
 
-              if (!(_this.options.retryAfter > 0)) {
-                _context4.next = 8;
+              _this2._trigger("retry", err);
+
+              if (!(_this2.options.retryAfter > 0)) {
+                _context4.next = 9;
                 break;
               }
 
-              _index2.default.debug("Retry after " + _this.options.retryAfter);
+              _this2.logger("debug", "- Will retry after " + _this2.options.retryAfter);
 
-              return _context4.abrupt("return", _this._setPromiseTimeout(_this.options.retryAfter).then(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+              return _context4.abrupt("return", _this2._setPromiseTimeout(_this2.options.retryAfter).then(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                   while (1) {
                     switch (_context3.prev = _context3.next) {
                       case 0:
-                        _index2.default.debug("THEN!");
+                        _this2.logger("debug", "- Retrying...");
                         _context3.next = 3;
-                        return _this._callWrappedTaskCallback();
+                        return _this2._callWrappedTaskCallback();
 
                       case 3:
                         return _context3.abrupt("return", _context3.sent);
@@ -223,22 +237,25 @@ var _initialiseProps = function _initialiseProps() {
                         return _context3.stop();
                     }
                   }
-                }, _callee3, _this);
+                }, _callee3, _this2);
               }))));
 
-            case 8:
-              _context4.next = 10;
-              return _this._callWrappedTaskCallback();
+            case 9:
 
-            case 10:
+              _this2.logger("debug", "- Retrying...");
+
+              _context4.next = 12;
+              return _this2._callWrappedTaskCallback();
+
+            case 12:
               return _context4.abrupt("return", _context4.sent);
 
-            case 11:
+            case 13:
             case "end":
               return _context4.stop();
           }
         }
-      }, _callee4, _this);
+      }, _callee4, _this2);
     }));
 
     return function (_x3) {
@@ -247,16 +264,17 @@ var _initialiseProps = function _initialiseProps() {
   }();
 
   this._failed = function (err) {
-    var onFailedValue = _this._mayCall(_this.options.onFailed, err);
+    _this2.logger("debug", "Task._failed()");
 
-    _index2.default.debug("_FAILED");
-    _this.state.isFailed = true;
+    _this2._trigger("failed", err);
+    _this2.state.isFailed = true;
 
-    if (onFailedValue === null) {
-      throw err;
+    if (_this2.options.exitOnFailed) {
+      _task2.default.info("Exiting process...");
+      process.exit(1);
     }
 
-    return onFailedValue;
+    return err;
   };
 
   this._callWrappedTaskCallback = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
@@ -265,9 +283,9 @@ var _initialiseProps = function _initialiseProps() {
         switch (_context5.prev = _context5.next) {
           case 0:
             _context5.next = 2;
-            return _this.promiseTaskCallback.then(function (func) {
-              return func.apply(undefined, _toConsumableArray(_this.params));
-            }).then(_this._success).catch(_this._retry);
+            return _this2.promiseTaskCallback.then(function (func) {
+              return func.apply(undefined, _toConsumableArray(_this2.params));
+            }).then(_this2._success).catch(_this2._retry);
 
           case 2:
             return _context5.abrupt("return", _context5.sent);
@@ -277,24 +295,8 @@ var _initialiseProps = function _initialiseProps() {
             return _context5.stop();
         }
       }
-    }, _callee5, _this);
+    }, _callee5, _this2);
   }));
-
-  this._mayCall = function (callback) {
-    for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      rest[_key2 - 1] = arguments[_key2];
-    }
-
-    if (_this._shouldCall(callback)) {
-      return callback.apply(undefined, rest);
-    }
-
-    return null;
-  };
-
-  this._shouldCall = function (callback) {
-    return typeof callback === "function";
-  };
 
   this._wrapWithPromise = function (callback) {
     return Promise.resolve(callback);

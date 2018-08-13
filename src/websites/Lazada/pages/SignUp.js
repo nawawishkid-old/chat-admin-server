@@ -18,13 +18,20 @@ class SignUpPage extends Page {
   signUp = async (fullName, email, password) => {
     await this.load();
 
-    console.log('findElem: ', this.task.findElement);
-
     const elem = await this.task.findElement
-      .config({ retries: 3, retryAfter: 500 })
+      .config({ retries: 3, retryAfter: 500, exitOnFailed: true })
       .perform(this.driver, this.elementSelectors.fullName);
 
-    console.log('ELEM: ', elem);
+    await this.task.sendKeys.perform(elem, fullName);
+    // await this.task.sendKeys.perform(this.driver, this.elementSelectors.fullName, fullName);
+
+    // console.log('findElem: ', this.task.findElement);
+
+    // const elem = await this.task.findElement
+    //   .config({ retries: 3, retryAfter: 500 })
+    //   .perform(this.driver, this.elementSelectors.fullName + 'aa');
+
+    // console.log('ELEM: ', elem);
 
     // const fullNameInput = await this.getElement("fullName").then(elem =>
     //   elem.sendKeys(fullName)

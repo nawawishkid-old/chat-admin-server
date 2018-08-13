@@ -4,6 +4,11 @@
 
 - [ ] USER CAN create/update/delete TASKs.
 
+## Todos
+
+- [ ] Fix page isCompatible()
+- [ ] Create server using pure NodeJS or Koa
+
 # Class
 
 ## WebSite
@@ -28,3 +33,16 @@
 
 - Page's method is a task.
 - WebSite's method is a pipeline.
+
+# Schemas
+
+## Customer
+
+- Fullname
+- email
+- password
+- address
+- postcode
+- phone
+
+##

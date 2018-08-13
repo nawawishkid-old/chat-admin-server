@@ -1,4 +1,4 @@
-import Task from "~/src/Task/TaskEventEmitter";
+import Task from "~/src/Task/Task";
 import { ThenableWebDriver, By } from "selenium-webdriver";
 import logger from "~/src/Logger/index";
 
@@ -8,23 +8,23 @@ const task = new Task(async (driver, selector) => {
 });
 
 // task.config({
- task.on('success', (elem, task) => {
-     logger.info("Element found.");
-     return elem;
-   });
- 
- task.on('failed', (err, task) => {
-     logger.error("Element not found.", err);
- 
-     if (task.options.alwaysThrow) {
-       throw err;
-     }
-   });
+task.on("success", (task, elem) => {
+  task.logger("info", "Element found.");
+  return elem;
+});
+
+task.on("failed", (task, err) => {
+  task.logger("error", err.message);
+  // if (task.options.alwaysThrow) {
+  //   throw err;
+  // }
+});
 // });
 
-// task.config({
-//   retry: 3
-// });
+task.config({
+  title: "findElement"
+  // retry: 3
+});
 
 // task.perform(selector)
 //   .then(elem => {
@@ -39,6 +39,6 @@ const task = new Task(async (driver, selector) => {
 // };
 
 // console.log('TASK: ', task);
-console.log('config: ', typeof task.config);
+// console.log("config: ", typeof task.config);
 
 export default task;

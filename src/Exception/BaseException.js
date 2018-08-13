@@ -1,6 +1,6 @@
 class BaseException extends Error {
   constructor(name, ...params) {
-	console.log('Params: ', ...params);
+    // console.log('Params: ', ...params);
     // Pass remaining arguments (including vendor specific ones) to parent constructor
     super(...params);
 

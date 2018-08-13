@@ -50,17 +50,24 @@ var SignUpPage = function (_Page) {
                 return _this.load();
 
               case 2:
+                _context.next = 4;
+                return _this.task.findElement.config({ retries: 3, retryAfter: 500, exitOnFailed: true }).perform(_this.driver, _this.elementSelectors.fullName);
 
-                console.log('findElem: ', _this.task.findElement);
-
-                _context.next = 5;
-                return _this.task.findElement.config({ retries: 3, retryAfter: 500 }).perform(_this.driver, _this.elementSelectors.fullName);
-
-              case 5:
+              case 4:
                 elem = _context.sent;
+                _context.next = 7;
+                return _this.task.sendKeys.perform(elem, fullName);
 
+              case 7:
+                // await this.task.sendKeys.perform(this.driver, this.elementSelectors.fullName, fullName);
 
-                console.log('ELEM: ', elem);
+                // console.log('findElem: ', this.task.findElement);
+
+                // const elem = await this.task.findElement
+                //   .config({ retries: 3, retryAfter: 500 })
+                //   .perform(this.driver, this.elementSelectors.fullName + 'aa');
+
+                // console.log('ELEM: ', elem);
 
                 // const fullNameInput = await this.getElement("fullName").then(elem =>
                 //   elem.sendKeys(fullName)

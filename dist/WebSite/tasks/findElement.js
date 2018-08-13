@@ -4,11 +4,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _Task = require("../../Task/Task");
 
-var _TaskEventEmitter = require("../../Task/TaskEventEmitter");
-
-var _TaskEventEmitter2 = _interopRequireDefault(_TaskEventEmitter);
+var _Task2 = _interopRequireDefault(_Task);
 
 var _seleniumWebdriver = require("selenium-webdriver");
 
@@ -21,7 +19,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 // const findElement = (driver, selector) => {
-var task = new _TaskEventEmitter2.default(function () {
+var task = new _Task2.default(function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(driver, selector) {
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -47,23 +45,23 @@ var task = new _TaskEventEmitter2.default(function () {
 }());
 
 // task.config({
-task.on('success', function (elem, task) {
-  _index2.default.info("Element found.");
+task.on("success", function (task, elem) {
+  task.logger("info", "Element found.");
   return elem;
 });
 
-task.on('failed', function (err, task) {
-  _index2.default.error("Element not found.", err);
-
-  if (task.options.alwaysThrow) {
-    throw err;
-  }
+task.on("failed", function (task, err) {
+  task.logger("error", err.message);
+  // if (task.options.alwaysThrow) {
+  //   throw err;
+  // }
 });
 // });
 
-// task.config({
-//   retry: 3
-// });
+task.config({
+  title: "findElement"
+  // retry: 3
+});
 
 // task.perform(selector)
 //   .then(elem => {
@@ -78,6 +76,6 @@ task.on('failed', function (err, task) {
 // };
 
 // console.log('TASK: ', task);
-console.log('config: ', _typeof(task.config));
+// console.log("config: ", typeof task.config);
 
 exports.default = task;

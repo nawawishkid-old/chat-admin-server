@@ -1,17 +1,19 @@
-import logger from "~/src/Logger/index";
+import { EventEmitter } from "events";
+import logger from "~/src/Logger/task";
 
-/**
- * Should have 'within' options
- * Should extends Node's EventEmitter class
- */
-class Task {
+class Task extends EventEmitter {
   constructor(callback, options = {}) {
+    super();
+
     this.promiseTaskCallback = this._wrapWithPromise(callback);
     this.options = {
+      title: "Untitled",
+      description: "No description",
       retries: 0,
       retryAfter: 0,
       retryEvery: 0,
       alwaysThrow: false,
+      exitOnFailed: false,
       ...options
     };
     this.state = {
@@ -19,31 +21,9 @@ class Task {
       isFailed: false,
       isSuccess: false
     };
+    this.logger = (level, msg) =>
+      logger.log(level, `#${this.options.title} -- ${msg}`);
   }
-
-  /**
-   *
-   *
-   * @api
-   * @returns {Task}
-   */
-  onFailed = callback => {
-    this.options.onFailed = callback;
-
-    return this;
-  };
-
-  /**
-   *
-   *
-   * @api
-   * @returns {Task}
-   */
-  onSuccess = callback => {
-    this.options.onSuccess = callback;
-
-    return this;
-  };
 
   /**
    *
@@ -67,7 +47,7 @@ class Task {
    * @returns {*}
    */
   perform = async (...params) => {
-    logger.debug("_PERFORM");
+    this.logger("debug", "Task.perform()");
 
     this.params = params;
 
@@ -77,21 +57,30 @@ class Task {
       .catch(this._unsuccess);
   };
 
-  _success = result => {
-    const onSuccessValue = this._mayCall(this.options.onSuccess, result);
+  /**
+   * EventEmitter's emit method wrapper
+   */
+  _trigger = (event, ...args) => {
+    return this.emit(event, this, ...args);
+  };
 
-    logger.debug("_SUCCESS");
-    logger.debug("Success result: ", typeof result);
+  _success = result => {
+    this.logger("debug", "Task._success()");
+    // this.logger('debug', "Success result: ", typeof result);
+
+    this._trigger("success", result);
     this.state.isSuccess = true;
 
-    return onSuccessValue === null ? result : onSuccessValue;
+    return result;
   };
 
   _unsuccess = async err => {
-    logger.debug("_UNSUCCESS");
+    this.logger("debug", "Task._unsuccess()");
+
+    this._trigger("unsuccess", err);
 
     if (this.options.retries < 1) {
-      logger.debug("No retry.");
+      this.logger("debug", "No retry.");
 
       return this._failed(err);
     }
@@ -100,38 +89,43 @@ class Task {
   };
 
   _retry = async err => {
-    logger.debug("_RETRY");
+    this.logger("debug", "Task._retry()");
 
     if (this.state.retried >= this.options.retries) {
-      logger.debug("Maximum retry reached.");
+      this.logger("debug", "Maximum retry reached.");
       return this._failed(err);
     }
 
     this.state.retried++;
 
+    this._trigger("retry", err);
+
     if (this.options.retryAfter > 0) {
-      logger.debug(`Retry after ${this.options.retryAfter}`);
+      this.logger("debug", `- Will retry after ${this.options.retryAfter}`);
 
       return this._setPromiseTimeout(this.options.retryAfter).then(async () => {
-        logger.debug("THEN!");
+        this.logger("debug", "- Retrying...");
         return await this._callWrappedTaskCallback();
       });
     }
+
+    this.logger("debug", "- Retrying...");
 
     return await this._callWrappedTaskCallback();
   };
 
   _failed = err => {
-    const onFailedValue = this._mayCall(this.options.onFailed, err);
+    this.logger("debug", "Task._failed()");
 
-    logger.debug("_FAILED");
+    this._trigger("failed", err);
     this.state.isFailed = true;
 
-    if (onFailedValue === null) {
-      throw err;
+    if (this.options.exitOnFailed) {
+      logger.info("Exiting process...");
+      process.exit(1);
     }
 
-    return onFailedValue;
+    return err;
   };
 
   _callWrappedTaskCallback = async () => {
@@ -144,17 +138,17 @@ class Task {
   /**
    * ===== Utils =====
    */
-  _mayCall = (callback, ...rest) => {
-    if (this._shouldCall(callback)) {
-      return callback(...rest);
-    }
-
-    return null;
-  };
-
-  _shouldCall = callback => {
-    return typeof callback === "function";
-  };
+  //  _mayCall = (callback, ...rest) => {
+  //    if (this._shouldCall(callback)) {
+  //      return callback(...rest);
+  //    }
+  //
+  //    return null;
+  //  };
+  //
+  //  _shouldCall = callback => {
+  //    return typeof callback === "function";
+  //  };
 
   _wrapWithPromise = callback => {
     return Promise.resolve(callback);
