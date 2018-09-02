@@ -1,72 +1,106 @@
-// import Page from "../WebSite/Page";
-// import driver from "~/src/drivers/index";
-import Pipeline from "~/src/Task/Pipeline";
-import TaskBox from "~/src/Task/TaskBox";
-import getLoadUrlTask from "../common/loadUrl";
-import getDomTask from "../common/dom";
-import getSelfieTask from "../common/selfie";
+import Pipeline from "~/src/app/modules/task/Pipeline";
+import { By } from "selenium-webdriver";
+import logger from "~/src/app/modules/logger/task";
 
-const pipeline = (driver, url, data) => {
-  const info = [
-    {
-      title: "Clicking 'sign up with email' button",
-      selector:
-        "form .mod-login .mod-login-change-register .mod-change-register-btn button[type=button]",
-      action: "click"
-    },
-    {
-      title: "Filling full name form field.",
-      selector: "form .mod-login .mod-login-input-name input[type=text]",
-      input: data.fullName,
-      action: "sendKeys"
-    },
-    {
-      title: "Filling email form field.",
-      selector: "form .mod-login .mod-login-input-email input[type=text]",
-      input: data.email,
-      action: "sendKeys"
-    },
-    {
-      title: "Filling password form field.",
-      selector:
-        "form .mod-login .mod-login-input-password input[type=password]",
-      input: data.password,
-      action: "sendKeys"
-    },
-    {
-      title: "Filling re-password form field.",
-      selector:
-        "form .mod-login .mod-login-input-re-password input[type=password]",
-      input: data.password,
-      action: "sendKeys"
-    },
-    {
-      title: "Click login button.",
-      selector: "form .mod-login .mod-login-btn button[type=submit]",
-      action: "click"
+// Not use Closure variable here
+const signup = async (driver, data) => {
+  console.log("signup()");
+  const p = new Pipeline({
+    data: {
+      logger: logger,
+      driver: driver,
+      pageUrl: "https://member.lazada.co.th/user/register",
+      selectors: {
+        signupWithEmailButton:
+          "form .mod-login .mod-login-change-register .mod-change-register-btn button[type=button]",
+        fullNameInput: "form .mod-login .mod-login-input-name input[type=text]",
+        emailInput: "form .mod-login .mod-login-input-email input[type=text]",
+        passwordInput:
+          "form .mod-login .mod-login-input-password input[type=password]",
+        rePasswordInput:
+          "form .mod-login .mod-login-input-re-password input[type=password]",
+        signupButton: "form .mod-login .mod-login-btn button[type=submit]"
+      },
+      args: data
     }
-  ];
-
-  const loadUrl = new TaskBox(getLoadUrlTask(driver, url));
-  const selfie = new TaskBox(
-    getSelfieTask(driver, `./storage/Lazada/screenshots/${Date.now()}.png`)
-  );
-  const taskBoxes = info.map(item => {
-    return new TaskBox(getDomTask(driver, item));
   });
 
-  const signUpPipeline = new Pipeline("Sign up", [
-    loadUrl,
-    ...taskBoxes,
-    selfie
-  ]);
+  // Load page
+  p.add(async (ctx, next) => {
+    ctx.pipeline.logger.info("#1 Load page.");
 
-  signUpPipeline.on("end", () => {
-    console.log("END!");
-    setTimeout(() => driver.quit(), 2000);
+    await ctx.pipeline.driver.get(ctx.pipeline.pageUrl);
+
+    next();
   });
 
-  return signUpPipeline;
+  // Click signup with email button
+  p.add(async (ctx, next) => {
+    ctx.pipeline.logger.info("#2 Click signup with email button.");
+
+    await ctx.pipeline.driver
+      .findElement(By.css(ctx.pipeline.selectors.signupWithEmailButton))
+      .click();
+
+    next();
+  });
+
+  // Type user's full name into text field
+  p.add(async (ctx, next) => {
+    ctx.pipeline.logger.info("#3 Type user's full name into text field.");
+
+    await ctx.pipeline.driver
+      .findElement(By.css(ctx.pipeline.selectors.fullNameInput))
+      .sendKeys(ctx.pipeline.args.fullName);
+
+    next();
+  });
+
+  // Type user's email into email field
+  p.add(async (ctx, next) => {
+    ctx.pipeline.logger.info("#4 Type user's email into email field.");
+
+    await ctx.pipeline.driver
+      .findElement(By.css(ctx.pipeline.selectors.emailInput))
+      .sendKeys(ctx.pipeline.args.email);
+
+    next();
+  });
+
+  // Type user's password into password field
+  p.add(async (ctx, next) => {
+    ctx.pipeline.logger.info("#5 Type user's password into password field.");
+
+    await ctx.pipeline.driver
+      .findElement(By.css(ctx.pipeline.selectors.passwordInput))
+      .sendKeys(ctx.pipeline.args.password);
+
+    next();
+  });
+
+  // Type user's password into repassword field
+  p.add(async (ctx, next) => {
+    ctx.pipeline.logger.info("#6 Type user's password into repassword field.");
+
+    await ctx.pipeline.driver
+      .findElement(By.css(ctx.pipeline.selectors.rePasswordInput))
+      .sendKeys(ctx.pipeline.args.password);
+
+    next();
+  });
+
+  // Click signup button
+  p.add(async (ctx, next) => {
+    ctx.pipeline.logger.info("#7 Click signup button.");
+
+    await ctx.pipeline.driver
+      .findElement(By.css(ctx.pipeline.selectors.signupButton))
+      .click();
+
+    next();
+  });
+
+  return await p.perform();
 };
 
-export default pipeline;
+export default signup;

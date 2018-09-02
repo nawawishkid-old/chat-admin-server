@@ -10,7 +10,26 @@ const db = {
   password: ""
 };
 const logger = {
-  level: "debug"
+  app: {
+    level: "debug",
+    label: "App"
+  },
+  api: {
+    level: "debug",
+    label: "API"
+  },
+  pipeline: {
+    level: "debug",
+    label: "Pipeline"
+  },
+  task: {
+    level: "debug",
+    label: "Task"
+  },
+  Page: {
+    level: "debug",
+    label: "Page"
+  }
 };
 
 export { server, db, logger };

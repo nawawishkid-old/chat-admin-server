@@ -1,7 +1,8 @@
 import config from "./config";
 import server from "./modules/server";
 // import db from "./modules/db";
-import logger from "./modules/logger";
+import logger from "./modules/logger/index";
+import socketio from "socket.io";
 
 const app = {};
 
@@ -13,6 +14,8 @@ app.logger = logger;
 
 // Server
 app.server = server;
+
+app.socket = socketio(server.listener);
 
 // Database
 // app.db = () => {
@@ -30,5 +33,7 @@ app.server = server;
 
 //   return db;
 // };
+
+// console.log("~/src/app/app: ", app);
 
 export default app;

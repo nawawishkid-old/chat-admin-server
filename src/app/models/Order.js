@@ -7,6 +7,7 @@ const orderSchema = new mongoose.Schema({
   owner: { type: Customer, required: true },
   quantity: { type: Number, required: true },
   products: { type: [Product], required: true },
+  is_ordered: { type: Boolean, default: false },
   created_at: Date,
   updated_at: Date
 });

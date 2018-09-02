@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { db as config } from "../config";
-import logger from "./logger";
+import logger from "./logger/index";
 
 mongoose.connect(
   `mongodb://${config.host}:${config.port}/${config.name}`,
