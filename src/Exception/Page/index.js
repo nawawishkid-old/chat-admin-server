@@ -1,1 +1,0 @@
-export { IncompatibleException } from "./IncompatibleException";
