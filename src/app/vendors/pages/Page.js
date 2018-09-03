@@ -173,6 +173,10 @@ class Page {
   _generateXPath = (key, modifier) => {
     return this.selectors.xPath[key].replace("%s", modifier);
   };
+
+  waitUntil = async (method, args = [], time = 10000, msg = null) => {
+    return await this.driver.wait(until[method](...args), time, msg);
+  };
 }
 
 export default Page;

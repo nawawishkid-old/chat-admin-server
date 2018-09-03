@@ -43,6 +43,7 @@ const pay = async (driver, data) => {
     console.log("- Get order number.");
     const orderNumber = await ctx.pipeline.thxPage.getOrderNumber();
     console.log("Order number: ", orderNumber);
+    p.setInfo("order", { number: orderNumber });
     next();
   });
 

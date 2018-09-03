@@ -52,13 +52,17 @@ class LazadaProductPage extends ProductPage {
     //   .perform();
 
     console.log("-- Get cart modal WebElementPromise");
-    modal = this.driver.findElement(By.css(this.selectors.cartModalElement));
+    modal = await this.driver.findElements(
+      By.css(this.selectors.cartModalElement)
+    );
 
     // await modal.sendKeys(Key.ESCAPE);
 
     // modal = this.driver.findElement(by);
     // Wait until cart modal disappear.
-    await this.driver.wait(until.elementIsNotVisible(modal), waitTime);
+    if (modal.length > 0) {
+      await this.driver.wait(until.elementIsNotVisible(modal[0]), waitTime);
+    }
 
     return true;
   };

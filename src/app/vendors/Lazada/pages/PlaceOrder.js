@@ -1,5 +1,6 @@
 import Page from "~/src/app/vendors/pages/Page";
 import { By } from "selenium-webdriver";
+import { URL } from "url";
 import logger from "~/src/app/modules/logger/page";
 
 class LazadaPlaceOrderPage extends Page {
@@ -51,7 +52,8 @@ class LazadaPlaceOrderPage extends Page {
         products: undefined,
         shipping: undefined,
         shippingDiscount: undefined
-      }
+      },
+      orderId: undefined
     };
   }
 
@@ -68,6 +70,18 @@ class LazadaPlaceOrderPage extends Page {
   placeOrder = async () => {
     logger.debug("LazadaPlaceOrderPage.placeOrder()");
     await this._click("placeOrderButton");
+  };
+
+  getOrderId = async () => {
+    logger.debug("LazadaPlaceOrderPage.getOrderId()");
+    const currentUrl = await this.driver.getCurrentUrl();
+    const url = new URL(currentUrl);
+    const orderId = url.searchParams.get("checkoutOrderId");
+    this.info.orderId = orderId;
+
+    console.log("- currentUrl: ", currentUrl, "- orderId: ", orderId);
+
+    return orderId;
   };
 
   applyVoucher = async code => {
@@ -120,7 +134,11 @@ class LazadaPlaceOrderPage extends Page {
 
   getShippingFeeDiscount = async () => {
     logger.debug("- LazadaPlaceOrderPage.getShippingFeeDiscount()");
-    return await this._getPrice("orderSummaryText.shippingFeeDiscount");
+    const discount = await this._getPrice(
+      "orderSummaryText.shippingFeeDiscount"
+    ).catch(err => logger.debug(err.message));
+
+    return typeof discount !== "number" ? 0 : discount;
   };
 
   getTotalPrice = async () => {

@@ -1,9 +1,10 @@
 import PlaceOrderPage from "~/src/app/vendors/Lazada/pages/PlaceOrder";
 import Pipeline from "~/src/app/modules/task/Pipeline";
+import { until } from "selenium-webdriver";
 
 const placeOrder = async (driver, data) => {
   const page = new PlaceOrderPage(driver);
-  const p = new Pipeline();
+  const p = new Pipeline("Placing order");
   const vouchers = data.voucher || [];
 
   // Load page.
@@ -13,6 +14,8 @@ const placeOrder = async (driver, data) => {
       console.log("-- loaded");
       next();
     }
+
+    p.setInfo("msg", "Cart is empty.");
   });
 
   p.add(async (ctx, next) => {
@@ -39,7 +42,24 @@ const placeOrder = async (driver, data) => {
 
   p.add(async (ctx, next) => {
     console.log("- Place order.");
+
     await page.placeOrder();
+    next();
+  });
+
+  p.add(async (ctx, next) => {
+    console.log("- Get order id.");
+
+    await page.waitUntil(
+      "urlContains",
+      ["checkoutOrderId"],
+      10000,
+      "Error: Could not reach payment page."
+    );
+
+    const orderId = await page.getOrderId();
+    // console.log("- orderId: ", orderId);
+    p.setInfo("order", { id: orderId }, true);
     next();
   });
 

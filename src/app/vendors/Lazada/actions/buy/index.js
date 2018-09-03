@@ -57,7 +57,7 @@ export const buy = async (driver, data) => {
       console.log("- Loading page");
       await page.load();
       // Temporary!!!
-      await driver.sleep(3000);
+      // await driver.sleep(3000);
       next();
     });
 

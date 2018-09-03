@@ -9,7 +9,7 @@ import Pipeline from "~/src/app/modules/task/Pipeline";
  */
 const login = async (driver, credential) => {
   const page = new LoginPage(driver);
-  const p = new Pipeline();
+  const p = new Pipeline("Log in");
 
   p.add(async (ctx, next) => {
     console.log("- Loading page.");

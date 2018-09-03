@@ -7,8 +7,8 @@ class LazadaPaymentPage extends Page {
 
     super(driver, "https://checkout.lazada.co.th/shipping", {
       cashOnDelivery: {
-        element: `#automation-payment-method-item-7`,
-        title: `#automation-payment-method-item-7 .title`,
+        element: `.payment-method-list .automation-payment-method-item:first-of-type`,
+        title: `.payment-method-list .automation-payment-method-item:first-of-type .title`,
         submitButton: `.pay-method-wrap-content .btn-place-order-wrap button.btn-place-order`
       }
     });

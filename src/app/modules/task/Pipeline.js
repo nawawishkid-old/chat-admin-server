@@ -3,7 +3,7 @@ import logger from "~/src/app/modules/logger/pipeline";
 
 // In NodeJS, use extend this class from EventEmitter.
 class Pipeline extends EventEmitter {
-  constructor(options = {}) {
+  constructor(name = "Untitled", options = {}) {
     super();
 
     this.options = {
@@ -11,9 +11,11 @@ class Pipeline extends EventEmitter {
       ...options
     };
     this._info = {
+      name: name,
       start: "",
       end: "",
       duration: "",
+      msg: "",
       taskBoxes: {
         all: [],
         complete: [],
@@ -82,6 +84,8 @@ class Pipeline extends EventEmitter {
    * @returns {this}
    */
   setInfo = (key, value, isMerge = false) => {
+    // logger.debug("Pipeline.setInfo()");
+    // console.log(`- key: ${key}, value: ${value}`);
     if (this._reservedInfo.indexOf(key) >= 0) {
       throw new Error("Error: Could not set reserved information: " + key);
     }
@@ -94,6 +98,8 @@ class Pipeline extends EventEmitter {
     } else {
       this._info[key] = value;
     }
+
+    // console.log("info: ", this._info);
 
     return this;
   };

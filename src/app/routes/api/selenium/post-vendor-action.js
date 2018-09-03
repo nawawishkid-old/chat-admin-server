@@ -24,7 +24,7 @@ export default {
       .split(",")
       .map(action => theVendor[action]); // (driver, data));
     // const pipelines = [];
-    const p = new Pipeline();
+    const p = new Pipeline(`${req.params.vendor} -- ${req.query.actions}`);
 
     p.setInfo("order", {});
 
@@ -34,6 +34,7 @@ export default {
         const pipeline = await actions[i](driver, data);
 
         p.setInfo("order", pipeline.getInfo().order, true);
+        p.setInfo("msg", pipeline.getInfo().msg);
 
         if (pipeline.getInfo().taskBoxes.failed.length > 0) {
           throw new Error("Error: Pipeline failed!");
