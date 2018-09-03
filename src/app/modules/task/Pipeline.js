@@ -23,6 +23,7 @@ class Pipeline extends EventEmitter {
         hanging: []
       }
     };
+    this._temp = {};
     this.state = {
       next: false,
       status: "COMPLETE"
@@ -113,6 +114,53 @@ class Pipeline extends EventEmitter {
   getInfo = () => this._info;
 
   /**
+   * Get or set pipeline's public information.
+   *
+   * @public
+   * @see Pipeline._common()
+   * @return {*}
+   */
+  info = (key, value = null, isMerge = false) => {
+    return this._common("_info", key, value, isMerge);
+  };
+
+  /**
+   * Get or set private temporary pipeline's data. Data in this object won't be shown on serialization.
+   *
+   * @public
+   * @see Pipeline._common()
+   * @return {*}
+   */
+  temp = (key, value = null, isMerge = false) => {
+    return this._common("_temp", key, value, isMerge);
+  };
+
+  /**
+   * Get or set pipeline's object property
+   *
+   * @private
+   * @param {String} objName Name of pipeline object property.
+   * @param {String} key Common data object key.
+   * @param {*} value Common data object value. Default is NULL.
+   * @param {Boolean} isMerge Whether to merge given value with existing value. Default is false.
+   * @return {undefinded}
+   */
+  _common = (objName, key, value = null, isMerge = false) => {
+    if (value === null) {
+      return this[objName][key];
+    }
+
+    if (isMerge) {
+      this[objName][key] = {
+        ...this[objName][key],
+        ...value
+      };
+    } else {
+      this[objName][key] = value;
+    }
+  };
+
+  /**
    * Performing all added tasks
    *
    * @public
@@ -157,6 +205,7 @@ class Pipeline extends EventEmitter {
 
       try {
         taskBox.info.start = Date.now();
+        // Context is not necessary anymore, should supply with `this` instead.
         await taskBox.task(context, this._next);
         taskBox.info.end = Date.now();
         taskBox.info.duration = taskBox.info.end - taskBox.info.start;

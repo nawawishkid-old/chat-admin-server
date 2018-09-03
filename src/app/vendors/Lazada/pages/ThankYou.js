@@ -1,4 +1,5 @@
 import Page from "~/src/app/vendors/pages/Page";
+import { URL } from "url";
 import logger from "~/src/app/modules/logger/page";
 
 class LazadaThankYouPage extends Page {
@@ -7,7 +8,8 @@ class LazadaThankYouPage extends Page {
 
     super(driver, url, {
       orderNumber: ".thank-you-order-number",
-      orderSummaryText: {
+      checkoutSummary: {
+        icon: `${base} .checkout-summary-icon`,
         subTotal: `${base} .checkout-summary-row:first-child .checkout-summary-value`,
         shippingFee: `${base} .checkout-summary-row:nth-child(2) .checkout-summary-value`,
         shippingFeeDiscount: `${base} .checkout-summary-row:nth-child(3) .checkout-summary-value`,
@@ -29,9 +31,15 @@ class LazadaThankYouPage extends Page {
     };
   }
 
-  getOrderNumber = async () => {
-    logger.debug("LazadaThankYouPage.getOrderNumber()");
-    const orderNumber = await this._getText("orderNumber");
+  getCheckoutNumber = async () => {
+    logger.debug("LazadaThankYouPage.getCheckoutNumber()");
+    let orderNumber = await this._getText("orderNumber");
+
+    if (!orderNumber) {
+      const url = new URL(await this.driver.getCurrentUrl());
+
+      orderNumber = url.searchParams.get("orderId");
+    }
 
     this.info.orderNumber = orderNumber;
 
@@ -47,8 +55,11 @@ class LazadaThankYouPage extends Page {
     return result;
   };
 
-  getOrderSummary = async () => {
-    logger.debug("LazadaThankYouPage.getOrderSummary()");
+  getCheckoutSummary = async () => {
+    logger.debug("LazadaThankYouPage.getCheckoutSummary()");
+    // Open checkout summary panel.
+    await this._click("checkoutSummary.icon");
+
     const results = await Promise.all([
       this.getProductsPrice(),
       this.getShippingFee(),
@@ -66,7 +77,7 @@ class LazadaThankYouPage extends Page {
 
   getProductsPrice = async () => {
     logger.debug("- LazadaThankYouPage.getProductsPrice()");
-    const result = await this._getPrice("orderSummaryText.subTotal");
+    const result = await this._getPrice("checkoutSummary.subTotal");
 
     this.info.price.products = result;
 
@@ -75,7 +86,7 @@ class LazadaThankYouPage extends Page {
 
   getShippingFee = async () => {
     logger.debug("- LazadaThankYouPage.getShippingFee()");
-    const result = await this._getPrice("orderSummaryText.shippingFee");
+    const result = await this._getPrice("checkoutSummary.shippingFee");
 
     this.info.price.shippingFee = result;
 
@@ -84,7 +95,7 @@ class LazadaThankYouPage extends Page {
 
   getShippingFeeDiscount = async () => {
     logger.debug("- LazadaThankYouPage.getShippingFeeDiscount()");
-    const result = await this._getPrice("orderSummaryText.shippingFeeDiscount");
+    const result = await this._getPrice("checkoutSummary.shippingFeeDiscount");
 
     this.info.price.shippingFeeDiscount = result;
 
@@ -93,7 +104,7 @@ class LazadaThankYouPage extends Page {
 
   getTotalPrice = async () => {
     logger.debug("- LazadaThankYouPage.getTotalPrice()");
-    const result = await this._getPrice("orderSummaryText.total");
+    const result = await this._getPrice("checkoutSummary.total");
 
     this.info.price.total = result;
 

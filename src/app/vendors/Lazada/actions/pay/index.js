@@ -3,47 +3,46 @@ import ThankYouPage from "~/src/app/vendors/Lazada/pages/ThankYou";
 import Pipeline from "~/src/app/modules/task/Pipeline";
 
 const pay = async (driver, data) => {
-  const paymentPage = new PaymentPage(driver);
-  const p = new Pipeline({
-    data: {
-      thxPage: undefined
-    }
-  });
+  const page = new PaymentPage(driver, data.orderId);
+  const p = new Pipeline();
 
   // Load page.
   p.add(async (ctx, next) => {
     console.log("- Loading page.");
-    await paymentPage.load();
+    await page.load();
     console.log("-- loaded");
     next();
   });
 
   p.add(async (ctx, next) => {
     console.log("- pay.");
-    await paymentPage.pay(data.paymentMethod);
+    await page.pay(data.paymentMethod);
     next();
   });
 
   p.add(async (ctx, next) => {
     console.log("Load ThankYouPage");
-    ctx.pipeline.thxPage = new ThankYouPage(
-      driver,
-      await driver.getCurrentUrl()
+    await page.waitUntil(
+      "urlContains",
+      ["https://checkout.lazada.co.th/order-received-new"],
+      10000,
+      "Could not reach ThankYou page."
     );
+    p.temp("thxPage", new ThankYouPage(driver, await driver.getCurrentUrl()));
     next();
   });
 
   p.add(async (ctx, next) => {
-    console.log("- Get order summary.");
-    await ctx.pipeline.thxPage.getOrderSummary();
+    console.log("- Get checkout summary.");
+    console.log(await p.temp("thxPage").getCheckoutSummary());
     next();
   });
 
   p.add(async (ctx, next) => {
     console.log("- Get order number.");
-    const orderNumber = await ctx.pipeline.thxPage.getOrderNumber();
-    console.log("Order number: ", orderNumber);
-    p.setInfo("order", { number: orderNumber });
+    const checkoutNumber = await p.temp("thxPage").getCheckoutNumber();
+    console.log("Order number: ", checkoutNumber);
+    p.setInfo("order", { number: checkoutNumber }, true);
     next();
   });
 
