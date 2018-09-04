@@ -1,4 +1,5 @@
 import { By, until } from "selenium-webdriver";
+import fs from "fs";
 import logger from "~/src/app/modules/logger/page";
 
 /**
@@ -176,6 +177,17 @@ class Page {
 
   waitUntil = async (method, args = [], time = 10000, msg = null) => {
     return await this.driver.wait(until[method](...args), time, msg);
+  };
+
+  selfie = async (filename, callback) => {
+    const imageFile = await this.driver.takeScreenshot();
+
+    fs.writeFile(filename, imageFile, err => {
+      if (err) throw err;
+
+      callback(filename);
+      logger.info(`Image saved: ${filename}`);
+    });
   };
 }
 

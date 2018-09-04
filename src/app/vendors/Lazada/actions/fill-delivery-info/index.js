@@ -1,6 +1,16 @@
 import DeliveryInfoPage from "~/src/app/vendors/Lazada/pages/DeliveryInfo";
 import Pipeline from "~/src/app/modules/task/Pipeline";
 
+/*
+{
+  fullName: String,
+  address: String,
+  province: String,
+  phoneNumber: String,
+  district: String,
+  postCode: Number
+}
+*/
 const fillDeliveryInfo = async (driver, data) => {
   const page = new DeliveryInfoPage(driver);
   const p = new Pipeline();
