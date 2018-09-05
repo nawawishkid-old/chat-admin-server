@@ -2,20 +2,35 @@ import mongoose from "mongoose";
 import { db as config } from "../config";
 import logger from "./logger/index";
 
-mongoose.connect(
-  `mongodb://${config.host}:${config.port}/${config.name}`,
-  {
-    useNewUrlParser: true
+export default {
+  connect: () => {
+    console.log("db.connect()");
+    const { readyState } = mongoose.connection;
+    // If already connected.
+    if (readyState > 0 && readyState < 3) {
+      return;
+    }
+
+    // console.log("Database connected");
+
+    mongoose.connect(
+      `mongodb://${config.username}:${config.password}@${config.host}:${
+        config.port
+      }/${config.name}`,
+      {
+        useNewUrlParser: true
+      }
+    );
+
+    const db = mongoose.connection;
+
+    db.on("error", err => {
+      logger.error("Database connection error: " + err);
+      console.log(mongoose.connection.readyState);
+    });
+    db.once("open", () => {
+      logger.info("Database connected.");
+      console.log(mongoose.connection.readyState);
+    });
   }
-);
-
-const db = mongoose.connection;
-
-db.on("error", () => {
-  logger.error("Database connection error: ");
-});
-db.once("open", () => {
-  logger.info("Database connected.");
-});
-
-export default db;
+};

@@ -1,39 +1,34 @@
-import config from "./config";
-import server from "./modules/server";
-// import db from "./modules/db";
-import logger from "./modules/logger/index";
-import socketio from "socket.io";
+import express from "express";
+import bodyParser from "body-parser";
+import routes from "./routes/index";
 
-const app = {};
+const app = express();
 
-// Configurations
-app.config = config;
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Logging
-app.logger = logger;
-
-// Server
-app.server = server;
-
-app.socket = socketio(server.listener);
-
-// Database
-// app.db = () => {
-//   const config = app.config.database;
-//   const db = mongoose.connect(
-//     `mongodb://${config.host}:${config.port}/${config.name}`
-//   );
-
-//   db.on("error", () => {
-//     app.logger.error("Database connection error: ");
+app.use((req, res, next) => {
+  console.log(`${req.method.toUpperCase()} ${req.path}`);
+  next();
+});
+// app.options("/token", (req, res) => {
+//   console.log("This is options!");
+//   res.json({
+//     msg: "This is options!"
 //   });
-//   db.once("open", () => {
-//     app.logger.info("Database connected.");
-//   });
+// });
 
-//   return db;
-// };
-
-// console.log("~/src/app/app: ", app);
+app.use((req, res, next) => {
+  // console.log("set header!");
+  res.set({
+    "Access-Control-Allow-Origin": "*",
+    // "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Headers": "*"
+  });
+  next();
+});
+app.use("/", routes.token);
+app.use("/api/selenium", routes.api.selenium);
+app.use("/api/template", routes.api.template);
 
 export default app;

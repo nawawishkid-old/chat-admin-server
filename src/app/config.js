@@ -1,15 +1,17 @@
-const server = {
+export const server = {
   host: "localhost",
   port: "11112"
 };
-const db = {
+
+export const db = {
   host: "localhost",
   port: "27017",
   name: "test",
-  username: "",
-  password: ""
+  username: "admin",
+  password: "adminAtTest"
 };
-const logger = {
+
+export const logger = {
   app: {
     level: "debug",
     label: "App"
@@ -32,9 +34,11 @@ const logger = {
   }
 };
 
-export { server, db, logger };
+export const SECRET_KEY = "secretKey";
+
 export default {
   server,
   db,
-  logger
+  logger,
+  SECRET_KEY
 };

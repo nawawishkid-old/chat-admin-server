@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "^4.16.3",
     "hapi": "^17.5.3",
+    "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.2.7",
     "node-fetch": "^2.2.0",
     "phantomjs-prebuilt": "^2.1.16",
