@@ -1,6 +1,6 @@
 import db from "~/src/app/modules/db";
 import { Router } from "express";
-import ctrl from "~/src/app/controllers/template";
+import ctrl from "~/src/app/controllers/templateInput";
 import authMiddleware from "../middlewares/auth";
 
 db.connect();
@@ -8,7 +8,7 @@ db.connect();
 const router = Router();
 
 // Get
-router.get("/:id?", authMiddleware, ctrl.get); // tested
+router.get("/:id?", authMiddleware, ctrl.get);
 
 // Create
 router.post("/new", authMiddleware, ctrl.create);

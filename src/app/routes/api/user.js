@@ -1,28 +1,31 @@
 import db from "~/src/app/modules/db";
-import User from "~/src/app/models/User";
+import { Router } from "express";
+import ctrl from "~/src/app/controllers/user";
+import authMiddleware from "../../middlewares/auth";
+import filterRequestBody from "../../middlewares/filterRequestBody";
 
 db.connect();
 
-export const get = {
-  method: "get",
-  path: "/user",
-  handler: async (req, res) => {}
-};
+const router = Router();
 
-export const create = {
-  method: "post",
-  path: "",
-  handler: async (req, res) => {
-    res.json({
-      msg: "created"
-    });
-  }
-};
+// Get
+router.get("/:id", authMiddleware, ctrl.get); // tested
 
-export const update = {
-  method: "post",
-  path: "",
-  handler: async (req, res) => {}
-};
+// Create
+router.post("/", ctrl.create); // tested
 
-export default { create };
+// Update
+router.post("/update/:id", authMiddleware, ctrl.update); // tested
+router.put("/:id", authMiddleware, ctrl.update); // tested
+router.patch(
+  "/:id",
+  authMiddleware,
+  filterRequestBody("username", "password", "email", "name"),
+  ctrl.update
+); // tested
+
+// Delete
+router.post("/delete/:id", authMiddleware, ctrl.delete); // tested
+router.delete("/:id", authMiddleware, ctrl.delete); // tested
+
+export default router;

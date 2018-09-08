@@ -1,19 +1,20 @@
 import mongoose from "mongoose";
+import { schema as templateInputSchema } from "./TemplateInput";
 import { updateDate } from "~/src/app/database/utils";
 
-mongoose.set("debug", true);
+// mongoose.set("debug", true);
 
-const templateSchema = new mongoose.Schema({
+export const schema = new mongoose.Schema({
   name: { type: String, required: true },
   content: { type: String, required: true },
-  symbol: String, // enum
-  inputs: Array, // Array of inputs object
+  symbol: { type: String, enum: ["{{", "[[", "%%", "__", "//"] }, // enum
+  inputs: [templateInputSchema], // Array of inputs object
   created_at: Date,
   updated_at: Date
 });
 
-templateSchema.pre("save", updateDate);
+schema.pre("save", updateDate);
 
-const Template = mongoose.model("Template", templateSchema);
+export const Model = mongoose.model("Template", schema);
 
-export default Template;
+export default Model;

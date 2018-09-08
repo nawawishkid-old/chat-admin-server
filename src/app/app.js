@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import routes from "./routes/index";
+import authRoute from "./routes/auth";
+import apiRoutes from "./routes/api/index";
 
 const app = express();
 
@@ -11,15 +12,8 @@ app.use((req, res, next) => {
   console.log(`${req.method.toUpperCase()} ${req.path}`);
   next();
 });
-// app.options("/token", (req, res) => {
-//   console.log("This is options!");
-//   res.json({
-//     msg: "This is options!"
-//   });
-// });
 
 app.use((req, res, next) => {
-  // console.log("set header!");
   res.set({
     "Access-Control-Allow-Origin": "*",
     // "Access-Control-Allow-Methods": "*",
@@ -27,8 +21,11 @@ app.use((req, res, next) => {
   });
   next();
 });
-app.use("/", routes.token);
-app.use("/api/selenium", routes.api.selenium);
-app.use("/api/template", routes.api.template);
+
+// app.use("/api/selenium", routes.api.selenium);
+app.use("/api/template/input", apiRoutes.templateInput);
+app.use("/api/template", apiRoutes.template);
+app.use("/api/user", apiRoutes.user);
+app.use("/auth", authRoute);
 
 export default app;

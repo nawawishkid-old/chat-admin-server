@@ -1,21 +1,22 @@
-import router from "./router";
-import tokenRoute from "./token";
-import seleniumRoute from "./api/selenium/index";
-import template from "./api/template";
+// import router from "./router";
+// import seleniumRoute from "./api/selenium/index";
+// import template from "./api/template";
+// import templateInput from "./api/templateInput";
+// import api from './api/index';
 
-export const token = router[tokenRoute.method](
-  tokenRoute.path,
-  tokenRoute.handler
-);
-export const api = {
-  selenium: router[seleniumRoute.method](
-    seleniumRoute.path,
-    seleniumRoute.handler
-  ),
-  template
-};
+// export * from "./auth";
+// export { api } from "./api/index";
 
-export default {
-  api,
-  token
-};
+// export const api = {
+//   selenium: router[seleniumRoute.method](
+//     seleniumRoute.path,
+//     seleniumRoute.handler
+//   ),
+//   template,
+//   templateInput
+// };
+
+// export default {
+//   api,
+//   auth
+// };

@@ -35,6 +35,8 @@ export const logger = {
 };
 
 export const SECRET_KEY = "secretKey";
+export const ACCESS_TOKEN_LIFESPAN = 60 * 60;
+export const REFRESH_TOKEN_LIFESPAN = 60 * 30;
 
 export default {
   server,

@@ -1,16 +1,23 @@
 import mongoose from "mongoose";
 import { updateDate } from "~/src/app/database/utils";
+import passwordHash from "password-hash";
 
-const userSchema = new mongoose.Schema({
+export const schema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  password: {
+    type: String,
+    required: true,
+    select: false,
+    set: value => passwordHash.generate(value)
+  },
   created_at: Date,
   updated_at: Date
 });
 
-userSchema.pre("save", updateDate);
+schema.pre("save", updateDate);
 
-const User = mongoose.model("User", userSchema);
+const Model = mongoose.model("User", schema);
 
-export default User;
+export default Model;
