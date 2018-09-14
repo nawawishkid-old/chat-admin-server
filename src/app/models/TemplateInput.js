@@ -3,28 +3,30 @@ import { updateDate } from "~/src/app/database/utils";
 
 mongoose.set("debug", true);
 
+/*
+{
+  name: String,
+  label: String,
+  options: Object, // Ant design field decorator
+  componentScheme: Object, // Data for creating React.Component
+  
+}
+*/
 export const schema = new mongoose.Schema({
-  type: { type: String, enum: ["text", "number", "select"], required: true },
+  // type: { type: String, enum: ["text", "number", "select"], required: true },
   name: { type: String, required: true, unique: true },
-  defaultValue: String,
-  props: {
-    type: [
-      {
-        name: String,
-        value: Schema.Types.Mixed
-      }
-    ],
-    set: value => {
-      console.log("value: ", value);
-      console.log("typeof value: ", typeof value);
-
-      const newValue = JSON.parse(value);
-
-      console.log("newValue: ", newValue);
-      console.log("typeof newValue: ", typeof newValue);
-
-      return newValue;
-    }
+  label: { type: String, required: true },
+  options: mongoose.Schema.Types.Mixed,
+  componentScheme: {
+    type: {
+      _type: {
+        type: String,
+        enum: ["text", "number", "select"],
+        required: true
+      },
+      props: mongoose.Schema.Types.Mixed
+    },
+    required: true
   },
   created_at: Date,
   updated_at: Date

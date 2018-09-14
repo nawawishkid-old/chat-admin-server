@@ -1,9 +1,9 @@
-import db from "~/src/app/modules/db";
+// import db from "~/src/app/modules/db";
 import { Router } from "express";
 import ctrl from "~/src/app/controllers/templateInput";
 import authMiddleware from "../middlewares/auth";
 
-db.connect();
+// db.connect();
 
 const router = Router();
 
@@ -11,12 +11,15 @@ const router = Router();
 router.get("/:id?", authMiddleware, ctrl.get);
 
 // Create
-router.post("/new", authMiddleware, ctrl.create);
+router.post("/", authMiddleware, ctrl.create);
 
 // Update
 router.post("/update/:id", authMiddleware, ctrl.update);
+router.put("/:id", authMiddleware, ctrl.update);
+router.patch("/:id", authMiddleware, ctrl.update);
 
 // Delete
 router.post("/delete/:id", authMiddleware, ctrl.delete);
+router.delete("/:id", authMiddleware, ctrl.delete);
 
 export default router;

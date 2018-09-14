@@ -10,20 +10,20 @@ import {
 import User from "../models/User";
 import passwordHash from "password-hash";
 
-db.connect();
-
 const router = Router();
 
 // Post
 // tested
 router.post("/token", (req, res) => {
+  db.connect();
+  console.log("body: ", req.body);
   const { username, password } = req.body;
 
   User.findOne({ username })
     .select("+password")
     .exec((err, doc) => {
       console.log("err: ", err, "doc: ", doc);
-      if (err) {
+      if (err || doc === null) {
         res.status(204).json({
           msg: "Unauthenticated",
           err: err
@@ -61,6 +61,7 @@ router.post("/token", (req, res) => {
 });
 
 router.post("/refresh", getAuthToken, (req, res) => {
+  db.connect();
   const oldToken = req.body.authToken;
   console.log("oldToken: ", oldToken);
 

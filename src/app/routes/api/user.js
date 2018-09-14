@@ -1,10 +1,10 @@
-import db from "~/src/app/modules/db";
+// import db from "~/src/app/modules/db";
 import { Router } from "express";
 import ctrl from "~/src/app/controllers/user";
 import authMiddleware from "../../middlewares/auth";
 import filterRequestBody from "../../middlewares/filterRequestBody";
 
-db.connect();
+// db.connect();
 
 const router = Router();
 

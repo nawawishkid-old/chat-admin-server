@@ -8,6 +8,7 @@ export default {
     const { readyState } = mongoose.connection;
     // If already connected.
     if (readyState > 0 && readyState < 3) {
+      console.log("db already connected.");
       return;
     }
 
@@ -32,5 +33,7 @@ export default {
       logger.info("Database connected.");
       console.log(mongoose.connection.readyState);
     });
+
+    return db;
   }
 };

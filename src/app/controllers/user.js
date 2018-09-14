@@ -1,3 +1,4 @@
+import db from "~/src/app/modules/db";
 import User from "../models/User";
 
 const ctrl = {};
@@ -9,6 +10,7 @@ const ctrl = {};
  * @param {Object} res Express.js's Response object
  */
 ctrl.get = (req, res) => {
+  db.connect();
   if (req.params.id === undefined) {
     res.json({
       msg: "User's id is required but not given."
@@ -38,6 +40,7 @@ ctrl.get = (req, res) => {
  * @param {Object} res Express.js's Response object
  */
 ctrl.create = (req, res) => {
+  db.connect();
   const { username, name, email, password } = req.body;
   const user = new User({
     username,
@@ -69,6 +72,7 @@ ctrl.create = (req, res) => {
  * @param {Object} res Express.js's Response object
  */
 ctrl.update = (req, res) => {
+  db.connect();
   User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
     if (err) {
       res.status(402).json({
@@ -91,6 +95,7 @@ ctrl.update = (req, res) => {
  * @param {Object} res Express.js's Response object
  */
 ctrl.delete = (req, res) => {
+  db.connect();
   User.findByIdAndRemove(req.params.id, (err, obj) => {
     if (err || obj === null) {
       res.status(402).json({
