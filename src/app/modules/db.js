@@ -12,7 +12,7 @@ export default {
       return;
     }
 
-    // console.log("Database connected");
+    mongoose.set("debug", true);
 
     mongoose.connect(
       `mongodb://${config.username}:${config.password}@${config.host}:${

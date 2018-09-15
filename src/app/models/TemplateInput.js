@@ -1,8 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { updateDate } from "~/src/app/database/utils";
 
-mongoose.set("debug", true);
-
 /*
 {
   name: String,
@@ -12,22 +10,19 @@ mongoose.set("debug", true);
   
 }
 */
-export const schema = new mongoose.Schema({
-  // type: { type: String, enum: ["text", "number", "select"], required: true },
+export const schema = new Schema({
   name: { type: String, required: true, unique: true },
   label: { type: String, required: true },
-  options: mongoose.Schema.Types.Mixed,
+  options: Schema.Types.Mixed,
   componentScheme: {
     type: {
-      _type: {
-        type: String,
-        enum: ["text", "number", "select"],
-        required: true
-      },
-      props: mongoose.Schema.Types.Mixed
+      type: String,
+      enum: ["text", "number", "select"],
+      required: true
     },
-    required: true
+    props: Schema.Types.Mixed
   },
+  creatorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   created_at: Date,
   updated_at: Date
 });

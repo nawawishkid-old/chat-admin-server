@@ -10,7 +10,7 @@ ctrl.get = (req, res) => {
   console.log("params: ", req.params);
 
   const condition =
-    typeof req.params.id !== "undefined" ? { id: req.params.id } : {};
+    typeof req.params.id !== "undefined" ? { _id: req.params.id } : {};
 
   TemplateInput.find(condition, (err, doc) => {
     if (err) {
@@ -31,19 +31,19 @@ ctrl.get = (req, res) => {
 ctrl.create = (req, res) => {
   db.connect();
   console.log("body: ", req.body);
-  // const { name, label, options, componentScheme } = req.body;
-  // let indexIsEnsured = false;
+  // const { name, label, options, componentScheme, accessToken } = req.body;
+  // const doc = { name, label, options, componentScheme, creatorId: JSON.parse()}
   TemplateInput.create(req.body, err => {
     if (err) {
       console.log("--- on save error: ", err);
-      res.status(402).json({
+      res.status(422).json({
         msg: "Failed to create: ",
         err: err
       });
       return;
     }
 
-    res.json({
+    res.status(201).json({
       msg: "Created successfully"
     });
   });
@@ -58,11 +58,11 @@ ctrl.create = (req, res) => {
 
   // TemplateInput.on("index", err => {
   //   console.log("----- INDEX!");
-  //   indexIsEnsured = true;
+  //   // indexIsEnsured = true;
 
   //   if (err) {
   //     console.log("--- on index error: ", err);
-  //     res.status(402).json({
+  //     res.status(422).json({
   //       msg: "Failed to create: ",
   //       err: err
   //     });
@@ -74,7 +74,7 @@ ctrl.create = (req, res) => {
   //   TemplateInput.create(req.body, err => {
   //     if (err) {
   //       console.log("--- on save error: ", err);
-  //       res.status(402).json({
+  //       res.status(422).json({
   //         msg: "Failed to create: ",
   //         err: err
   //       });
@@ -102,7 +102,7 @@ ctrl.create = (req, res) => {
   // TemplateInput.create(req.body, err => {
   //   if (err) {
   //     console.log(">>> on save error2: ", err);
-  //     res.status(402).json({
+  //     res.status(422).json({
   //       msg: "Failed to create: ",
   //       err: err
   //     });
@@ -128,7 +128,7 @@ ctrl.update = (req, res) => {
 
   TemplateInput.findByIdAndUpdate(req.params.id, newDoc, (err, doc) => {
     if (err) {
-      res.status(402).json({
+      res.status(422).json({
         msg: "Update failed",
         err: err
       });
@@ -146,14 +146,14 @@ ctrl.delete = (req, res) => {
   db.connect();
   TemplateInput.findByIdAndRemove(req.params.id, (err, doc) => {
     if (err) {
-      res.status(402).json({
+      res.status(422).json({
         msg: "Delete failed",
         err: err
       });
       return;
     }
 
-    res.json({
+    res.status(410).json({
       msg: "Deleted"
     });
   });

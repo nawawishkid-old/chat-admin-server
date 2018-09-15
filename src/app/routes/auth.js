@@ -42,7 +42,7 @@ router.post("/token", (req, res) => {
       }
 
       jwt.sign(
-        {},
+        { sub: doc._id },
         SECRET_KEY,
         { expiresIn: ACCESS_TOKEN_LIFESPAN },
         (err, token) => {

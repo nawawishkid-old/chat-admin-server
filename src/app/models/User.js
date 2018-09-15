@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { updateDate } from "~/src/app/database/utils";
 import passwordHash from "password-hash";
 
 /**
  * Required input validation e.g. email, name
  */
-export const schema = new mongoose.Schema({
+export const schema = new Schema({
   username: { type: String, required: true, unique: true },
   // Always store username in lower case
   name: { type: String, required: true, lowercase: true },

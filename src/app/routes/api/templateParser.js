@@ -8,8 +8,8 @@ import authMiddleware from "../middlewares/auth";
 const router = Router();
 
 // Get
-router.get("/", ctrl.get);
-// router.get("/:templateId", authMiddleware, ctrl.get);
+// router.get("/", ctrl.get);
+router.get("/:templateId", authMiddleware, ctrl.get);
 
 // Create
 // router.post("/new", authMiddleware, ctrl.create);

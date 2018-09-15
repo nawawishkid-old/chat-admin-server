@@ -23,9 +23,9 @@ app.use((req, res, next) => {
 });
 
 // app.use("/api/selenium", routes.api.selenium);
+app.use("/api/template/parser", apiRoutes.templateParser);
 app.use("/api/template/input", apiRoutes.templateInput);
 app.use("/api/template", apiRoutes.template);
-app.use("/api/parse", apiRoutes.templateParser);
 app.use("/api/user", apiRoutes.user);
 app.use("/auth", authRoute);
 
