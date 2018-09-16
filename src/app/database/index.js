@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-import { db as config } from "../config";
-import logger from "./logger/index";
+import { db as config } from "~/src/app/config";
 
 export default {
   connect: () => {
@@ -26,11 +25,11 @@ export default {
     const db = mongoose.connection;
 
     db.on("error", err => {
-      logger.error("Database connection error: " + err);
+      console.log("Database connection error: " + err);
       console.log(mongoose.connection.readyState);
     });
     db.once("open", () => {
-      logger.info("Database connected.");
+      console.log("Database connected.");
       console.log(mongoose.connection.readyState);
     });
 

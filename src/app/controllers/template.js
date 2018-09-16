@@ -1,4 +1,4 @@
-import db from "~/src/app/modules/db";
+import db from "~/src/app/database";
 import Template from "../models/Template";
 
 const ctrl = {};
@@ -28,14 +28,8 @@ ctrl.get = (req, res) => {
 // Create
 ctrl.create = (req, res) => {
   db.connect();
-  const { name, content, openTag, closingTag, inputs } = req.body;
-  const template = new Template({
-    name,
-    content,
-    openTag,
-    closingTag,
-    inputs
-  });
+  // const { name, content, openTag, closingTag, inputs } = req.body;
+  const template = new Template(req.body);
 
   template.save(err => {
     if (err) {

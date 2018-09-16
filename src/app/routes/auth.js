@@ -1,4 +1,4 @@
-import db from "~/src/app/modules/db";
+import db from "~/src/app/database";
 import { Router } from "express";
 import getAuthToken from "./middlewares/getAuthToken";
 import jwt from "jsonwebtoken";

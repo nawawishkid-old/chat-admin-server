@@ -1,6 +1,6 @@
-import db from "~/src/app/modules/db";
+import db from "~/src/app/database";
 import Template from "../models/Template";
-import templateParser from "~/src/app/modules/template-parser/index";
+import templateParser from "~/src/app/modules/template-parser";
 
 const ctrl = {};
 

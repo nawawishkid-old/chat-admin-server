@@ -1,4 +1,4 @@
-import db from "~/src/app/modules/db";
+import db from "~/src/app/database";
 import User from "../models/User";
 
 const ctrl = {};
