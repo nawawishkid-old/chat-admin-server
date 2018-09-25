@@ -12,9 +12,11 @@ ctrl.get = (req, res) => {
   const condition =
     typeof req.params.id !== "undefined" ? { _id: req.params.id } : {};
 
+  console.log("condition: ", condition);
+
   TemplateInput.find(condition, (err, doc) => {
     if (err) {
-      res.json({
+      res.status(404).json({
         msg: "No entry found."
       });
       return;
@@ -22,7 +24,7 @@ ctrl.get = (req, res) => {
 
     res.json({
       msg: `Found ${doc.length} document(s).`,
-      doc: doc
+      data: { templateInput: doc.length > 1 ? doc : doc[0] }
     });
   });
 };
@@ -52,13 +54,17 @@ ctrl.create = (req, res) => {
 // Update
 ctrl.update = (req, res) => {
   db.connect();
-  const { type, name, defaultValue, props } = req.body;
-  const newDoc = {
-    type,
-    name,
-    defaultValue,
-    props
-  };
+  const { name, label, options, componentScheme } = req.body;
+  const newDoc = { name, label, options, componentScheme };
+  console.log("options: ", newDoc.componentScheme.options);
+  console.log("newDoc: ", newDoc);
+  // const { type, name, defaultValue, props } = req.body;
+  // const newDoc = {
+  //   type,
+  //   name,
+  //   defaultValue,
+  //   props,
+  // };
 
   TemplateInput.findByIdAndUpdate(req.params.id, newDoc, (err, doc) => {
     if (err) {
@@ -69,8 +75,11 @@ ctrl.update = (req, res) => {
       return;
     }
 
+    console.log("Updated doc: ", doc);
+
     res.json({
-      msg: "Updated"
+      msg: "Updated",
+      data: { templateInput: doc.length > 1 ? doc : doc[0] }
     });
   });
 };
@@ -87,7 +96,7 @@ ctrl.delete = (req, res) => {
       return;
     }
 
-    res.status(410).json({
+    res.json({
       msg: "Deleted"
     });
   });

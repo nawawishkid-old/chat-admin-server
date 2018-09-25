@@ -12,7 +12,7 @@ const ctrl = {};
 ctrl.get = (req, res) => {
   db.connect();
   if (req.params.id === undefined) {
-    res.json({
+    res.status(422).json({
       msg: "User's id is required but not given."
     });
     return;
@@ -20,7 +20,7 @@ ctrl.get = (req, res) => {
 
   User.findById(req.params.id, (err, doc) => {
     if (err || doc === null) {
-      res.json({
+      res.status(404).json({
         msg: "No entry found."
       });
       return;
@@ -28,7 +28,7 @@ ctrl.get = (req, res) => {
 
     res.json({
       msg: `Found.`,
-      doc: doc
+      data: { user: doc }
     });
   });
 };
@@ -52,7 +52,7 @@ ctrl.create = (req, res) => {
   user.save(err => {
     if (err) {
       console.error("err: ", err);
-      res.status(402).json({
+      res.status(422).json({
         msg: "Failed to create: ",
         err: err
       });
@@ -75,7 +75,7 @@ ctrl.update = (req, res) => {
   db.connect();
   User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
     if (err) {
-      res.status(402).json({
+      res.status(422).json({
         msg: "Update failed",
         err: err
       });
@@ -98,7 +98,7 @@ ctrl.delete = (req, res) => {
   db.connect();
   User.findByIdAndRemove(req.params.id, (err, obj) => {
     if (err || obj === null) {
-      res.status(402).json({
+      res.status(422).json({
         msg: "Delete failed",
         err: err
       });

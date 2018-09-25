@@ -11,16 +11,17 @@ ctrl.get = (req, res) => {
   Template.find(condition)
     .populate("inputs")
     .exec((err, doc) => {
+      console.log("EXECUTED.....................");
       if (err) {
-        res.json({
-          msg: "No entry found."
+        res.status(404).json({
+          msg: "No entry found.",
         });
         return;
       }
 
       res.json({
         msg: `Found ${doc.length} document(s).`,
-        doc: doc
+        data: { doc: doc.length > 1 ? doc : doc[0] }
       });
     });
 };
@@ -34,15 +35,15 @@ ctrl.create = (req, res) => {
   template.save(err => {
     if (err) {
       console.error("err: ", err);
-      res.status(402).json({
+      res.status(422).json({
         msg: "Failed to create: ",
-        err: err
+        err: err,
       });
       return;
     }
 
     res.json({
-      msg: "Created successfully"
+      msg: "Created successfully",
     });
   });
 };
@@ -50,25 +51,20 @@ ctrl.create = (req, res) => {
 // Update
 ctrl.update = (req, res) => {
   db.connect();
-  const { name, symbol, content, inputs } = req.body;
-  const newDoc = {
-    name,
-    symbol,
-    content,
-    inputs
-  };
+  const { name, content, openTag, closingTag, inputs, ...rest } = req.body;
+  const newDoc = { name, content, openTag, closingTag, inputs };
 
   Template.findByIdAndUpdate(req.params.id, newDoc, (err, doc) => {
     if (err) {
-      res.status(402).json({
+      res.status(422).json({
         msg: "Update failed",
-        err: err
+        err: err,
       });
       return;
     }
 
     res.json({
-      msg: "Updated"
+      msg: "Updated",
     });
   });
 };
@@ -78,15 +74,15 @@ ctrl.delete = (req, res) => {
   db.connect();
   Template.findByIdAndRemove(req.params.id, (err, doc) => {
     if (err) {
-      res.status(402).json({
+      res.status(422).json({
         msg: "Delete failed",
-        err: err
+        err: err,
       });
       return;
     }
 
     res.json({
-      msg: "Deleted"
+      msg: "Deleted",
     });
   });
 };

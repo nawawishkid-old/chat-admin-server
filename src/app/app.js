@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   console.log(`${req.method.toUpperCase()} ${req.path}`);
+	console.log('req.body: ', req.body);
   next();
 });
 
@@ -26,7 +27,7 @@ app.use((req, res, next) => {
 app.use("/api/template/parser", apiRoutes.templateParser);
 app.use("/api/template/input", apiRoutes.templateInput);
 app.use("/api/template", apiRoutes.template);
-app.use("/api/user", apiRoutes.user);
+app.use("/api/users", apiRoutes.user);
 app.use("/auth", authRoute);
 
 export default app;

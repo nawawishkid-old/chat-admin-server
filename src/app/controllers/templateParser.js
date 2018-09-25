@@ -12,7 +12,7 @@ ctrl.get = (req, res) => {
 
   Template.findById(req.params.templateId, (err, doc) => {
     if (err) {
-      res.status().json({
+      res.status(404).json({
         msg: "Could not find template.",
         err: err
       });
@@ -29,7 +29,7 @@ ctrl.get = (req, res) => {
 
     res.status(200).json({
       msg: "Template parsed successfully.",
-      content: newContent
+      data: newContent
     });
   });
   // Mocking

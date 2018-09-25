@@ -3,8 +3,7 @@ import { SECRET_KEY } from "~/src/app/config";
 import { getTokenFromHttpHeader } from "./utils";
 
 export default (req, res, next) => {
-  console.log("auth middleware");
-  console.log("body: ", req.body);
+  console.log("[MIDDLEWARE] auth");
   const token = getTokenFromHttpHeader(req.header("Authorization"));
 
   if (!token) {
@@ -13,7 +12,7 @@ export default (req, res, next) => {
   }
 
   jwt.verify(token, SECRET_KEY, (err, authData) => {
-    console.log("authData: ", authData);
+    // console.log("authData: ", authData);
     if (err) {
       res.set(
         "WWW-Authenticate",
@@ -26,7 +25,7 @@ export default (req, res, next) => {
       return;
     }
 
-    console.log("authenticated!");
+    console.log("- Authenticated!");
 
     next();
   });

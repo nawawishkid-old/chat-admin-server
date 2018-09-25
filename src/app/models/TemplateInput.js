@@ -20,7 +20,8 @@ export const schema = new Schema({
       enum: ["text", "number", "select"],
       required: true
     },
-    props: Schema.Types.Mixed
+    props: Schema.Types.Mixed,
+    options: [{ label: String, value: String, isDefault: Boolean }]
   },
   creatorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   created_at: Date,
