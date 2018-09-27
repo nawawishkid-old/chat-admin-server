@@ -1,8 +1,13 @@
 const { Router } = require("express");
 const ctrl = require("../../controllers/templateInput");
-const withRequestBodyFilter = require("../../middlewares/withRequestBodyFilter");
+const {
+  withAuth,
+  withRequestBodyFilter,
+  withCreatorId,
+  connectDB
+} = require("../../middlewares");
 
-const templateInputRouter = Router();
+const router = Router();
 
 const requestBodyFilter = withRequestBodyFilter.create(
   "name",
@@ -11,15 +16,18 @@ const requestBodyFilter = withRequestBodyFilter.create(
   "creatorId"
 );
 
-templateInputRouter.get("/:id?", ctrl.get);
+const middlewares1 = [withAuth, connectDB];
+const middlewares2 = [withAuth, withCreatorId, requestBodyFilter, connectDB];
 
-templateInputRouter.post("/", requestBodyFilter, ctrl.create);
+router.get("/:id?", ...middlewares1, ctrl.get);
 
-templateInputRouter.post("/update/:id", requestBodyFilter, ctrl.update);
-templateInputRouter.put("/:id", requestBodyFilter, ctrl.update);
-templateInputRouter.patch("/:id", requestBodyFilter, ctrl.update);
+router.post("/", ...middlewares2, ctrl.create);
 
-templateInputRouter.post("/delete/:id", ctrl.delete);
-templateInputRouter.delete("/:id", ctrl.delete);
+router.post("/update/:id", ...middlewares2, ctrl.update);
+router.put("/:id", ...middlewares2, ctrl.update);
+router.patch("/:id", ...middlewares2, ctrl.update);
 
-module.exports = templateInputRouter;
+router.post("/delete/:id", ...middlewares1, ctrl.delete);
+router.delete("/:id", ...middlewares1, ctrl.delete);
+
+module.exports = router;

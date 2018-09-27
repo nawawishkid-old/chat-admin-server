@@ -1,9 +1,9 @@
-const db = require("../database");
 const Template = require("../models/Template");
 
 // Get
 exports.get = (req, res) => {
-  db.connect();
+  console.log("[CTRLLR]: template.get()");
+
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
   Template.find(condition)
@@ -26,7 +26,8 @@ exports.get = (req, res) => {
 
 // Create
 exports.create = (req, res) => {
-  db.connect();
+  console.log("[CTRLLR]: template.create()");
+
   // const { name, content, openTag, closingTag, inputs } = req.body;
   const template = new Template(req.body);
 
@@ -48,7 +49,8 @@ exports.create = (req, res) => {
 
 // Update
 exports.update = (req, res) => {
-  db.connect();
+  console.log("[CTRLLR]: template.update()");
+
   const { name, content, openTag, closingTag, inputs, ...rest } = req.body;
   const newDoc = { name, content, openTag, closingTag, inputs };
 
@@ -69,7 +71,8 @@ exports.update = (req, res) => {
 
 // Delete
 exports.delete = (req, res) => {
-  db.connect();
+  console.log("[CTRLLR]: template.delete()");
+
   Template.findByIdAndRemove(req.params.id, (err, doc) => {
     if (err) {
       res.status(422).json({
