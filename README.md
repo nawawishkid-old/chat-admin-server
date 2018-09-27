@@ -1,5 +1,1 @@
-# TODO
-- [ ] Redesign Pipeline
-- [ ] Create API authentication.
-
-# API Authentication
+# Chat template administration
