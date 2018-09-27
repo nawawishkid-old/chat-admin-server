@@ -1,20 +1,22 @@
-import db from "~/src/app/database";
-import { Router } from "express";
-import getAuthToken from "./middlewares/getAuthToken";
-import jwt from "jsonwebtoken";
-import {
+const db = require("../database");
+const { Router } = require("express");
+const getAuthToken = require("../middlewares/getAuthToken");
+const jwt = require("jsonwebtoken");
+const {
   SECRET_KEY,
   ACCESS_TOKEN_LIFESPAN,
   REFRESH_TOKEN_LIFESPAN
-} from "~/src/app/config";
-import User from "../models/User";
-import passwordHash from "password-hash";
+} = require("../config");
+const User = require("../models/User");
+const passwordHash = require("password-hash");
 
-const router = Router();
+const authRouter = Router();
 
 // Post
 // tested
-router.post("/token", (req, res) => {
+authRouter.post("/token", (req, res) => {
+  console.log("DB: ", db);
+
   db.connect();
   console.log("body: ", req.body);
   const { username, password } = req.body;
@@ -60,7 +62,7 @@ router.post("/token", (req, res) => {
     });
 });
 
-router.post("/refresh", getAuthToken, (req, res) => {
+authRouter.post("/refresh", getAuthToken, (req, res) => {
   db.connect();
   const oldToken = req.body.authToken;
   console.log("oldToken: ", oldToken);
@@ -104,12 +106,12 @@ router.post("/refresh", getAuthToken, (req, res) => {
 });
 
 // Create
-// router.post("/new", authMiddleware, ctrl.create);
+// authRouter.post("/new", authMiddleware, ctrl.create);
 
 // // Update
-// router.post("/update/:id", authMiddleware, ctrl.update);
+// authRouter.post("/update/:id", authMiddleware, ctrl.update);
 
 // // Delete
-// router.post("/delete/:id", authMiddleware, ctrl.delete);
+// authRouter.post("/delete/:id", authMiddleware, ctrl.delete);
 
-export default router;
+module.exports = authRouter;

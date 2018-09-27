@@ -1,23 +1,19 @@
-// import db from "~/src/app/database";
-import { Router } from "express";
-import ctrl from "~/src/app/controllers/templateParser";
-import authMiddleware from "../middlewares/auth";
+const { Router } = require("express");
+const ctrl = require("../../controllers/templateParser");
 
-// db.connect();
-
-const router = Router();
+const templateParserRouter = Router();
 
 // Get
-// router.get("/", ctrl.get);
-router.get("/:templateId", authMiddleware, ctrl.get);
+// templateParserRouter.get("/", ctrl.get);
+templateParserRouter.get("/:templateId", ctrl.get);
 
 // Create
-// router.post("/new", authMiddleware, ctrl.create);
+// templateParserRouter.post("/new",  ctrl.create);
 
 // // Update
-// router.post("/update/:id", authMiddleware, ctrl.update);
+// templateParserRouter.post("/update/:id",  ctrl.update);
 
 // // Delete
-// router.post("/delete/:id", authMiddleware, ctrl.delete);
+// templateParserRouter.post("/delete/:id",  ctrl.delete);
 
-export default router;
+module.exports = templateParserRouter;

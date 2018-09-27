@@ -1,10 +1,8 @@
-import db from "~/src/app/database";
-import Template from "../models/Template";
-
-const ctrl = {};
+const db = require("../database");
+const Template = require("../models/Template");
 
 // Get
-ctrl.get = (req, res) => {
+exports.get = (req, res) => {
   db.connect();
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
@@ -14,7 +12,7 @@ ctrl.get = (req, res) => {
       console.log("EXECUTED.....................");
       if (err) {
         res.status(404).json({
-          msg: "No entry found.",
+          msg: "No entry found."
         });
         return;
       }
@@ -27,7 +25,7 @@ ctrl.get = (req, res) => {
 };
 
 // Create
-ctrl.create = (req, res) => {
+exports.create = (req, res) => {
   db.connect();
   // const { name, content, openTag, closingTag, inputs } = req.body;
   const template = new Template(req.body);
@@ -37,19 +35,19 @@ ctrl.create = (req, res) => {
       console.error("err: ", err);
       res.status(422).json({
         msg: "Failed to create: ",
-        err: err,
+        err: err
       });
       return;
     }
 
     res.json({
-      msg: "Created successfully",
+      msg: "Created successfully"
     });
   });
 };
 
 // Update
-ctrl.update = (req, res) => {
+exports.update = (req, res) => {
   db.connect();
   const { name, content, openTag, closingTag, inputs, ...rest } = req.body;
   const newDoc = { name, content, openTag, closingTag, inputs };
@@ -58,33 +56,31 @@ ctrl.update = (req, res) => {
     if (err) {
       res.status(422).json({
         msg: "Update failed",
-        err: err,
+        err: err
       });
       return;
     }
 
     res.json({
-      msg: "Updated",
+      msg: "Updated"
     });
   });
 };
 
 // Delete
-ctrl.delete = (req, res) => {
+exports.delete = (req, res) => {
   db.connect();
   Template.findByIdAndRemove(req.params.id, (err, doc) => {
     if (err) {
       res.status(422).json({
         msg: "Delete failed",
-        err: err,
+        err: err
       });
       return;
     }
 
     res.json({
-      msg: "Deleted",
+      msg: "Deleted"
     });
   });
 };
-
-export default ctrl;

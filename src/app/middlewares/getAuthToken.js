@@ -1,6 +1,6 @@
-import { getTokenFromHttpHeader } from "./utils";
+const { getTokenFromHttpHeader } = require("./utils");
 
-export default (req, res, next) => {
+module.exports = (req, res, next) => {
   console.log("auth middleware");
   console.log("body: ", req.body);
   const token = getTokenFromHttpHeader(req.header("Authorization"));

@@ -1,11 +1,9 @@
-import db from "~/src/app/database";
-import Template from "../models/Template";
-import templateParser from "~/src/app/modules/template-parser";
-
-const ctrl = {};
+const db = require("../database");
+const Template = require("../models/Template");
+const templateParser = require("../modules/template-parser");
 
 // Get
-ctrl.get = (req, res) => {
+exports.get = (req, res) => {
   db.connect();
   console.log("body: ", req.body);
   console.log("query: ", req.query);
@@ -34,7 +32,7 @@ ctrl.get = (req, res) => {
   });
   // Mocking
   // const content =
-  //   "สวัสดี[[suffix]]คุณลูกค้า {{shopName}} ยินดีให้บริการ{{suffix}}";
+  //   "สวัสดี[[suffix]]คุณลูกค้า {{shopName}} ยินดีให้บริการ{{suffix}}");
   // const openTag = "{{";
   // const closingTag = "}}";
   // const userParams = {
@@ -67,5 +65,3 @@ ctrl.get = (req, res) => {
   //   });
   // });
 };
-
-export default ctrl;

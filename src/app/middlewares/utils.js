@@ -1,4 +1,5 @@
-export const getTokenFromHttpHeader = authHeader => {
+exports.getTokenFromHttpHeader = authHeader => {
+  console.log("authHeader: ", authHeader);
   if (typeof authHeader === "undefined") {
     return null;
   }

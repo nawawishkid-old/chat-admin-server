@@ -1,6 +1,6 @@
-const getFilterRequestBody = (...key) => {
+exports.create = (...key) => {
   return (req, res, next) => {
-    console.log("[MIDDLEWARE]: filterRequestBody");
+    console.log("[MIDDLEWARE]: withRequestBodyFilter");
     const bodyKeys = Object.keys(req.body);
 
     // Remove unrelated properties.
@@ -15,7 +15,7 @@ const getFilterRequestBody = (...key) => {
 
     if (isInvalid) {
       res.status(422).json({
-        msg: "Invalid argument",
+        msg: "Invalid argument"
       });
       return;
     }
@@ -23,7 +23,3 @@ const getFilterRequestBody = (...key) => {
     next();
   };
 };
-
-export { getFilterRequestBody };
-
-export default getFilterRequestBody;

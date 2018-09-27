@@ -1,5 +1,7 @@
-import mongoose, { Schema } from "mongoose";
-import { updateDate } from "~/src/app/database/utils";
+const mongoose = require("mongoose");
+const { updateDate } = require("../database/utils");
+
+const { Schema } = mongoose;
 
 /*
 {
@@ -10,7 +12,7 @@ import { updateDate } from "~/src/app/database/utils";
   
 }
 */
-export const schema = new Schema({
+const schema = new Schema({
   name: { type: String, required: true, unique: true },
   label: { type: String, required: true },
   options: Schema.Types.Mixed,
@@ -30,6 +32,4 @@ export const schema = new Schema({
 
 schema.pre("save", updateDate);
 
-export const Model = mongoose.model("TemplateInput", schema);
-
-export default Model;
+module.exports = mongoose.model("TemplateInput", schema);

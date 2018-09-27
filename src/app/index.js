@@ -1,6 +1,6 @@
-import "babel-polyfill";
-import app from "./app";
-import config from "./config";
+// require("babel-polyfill");
+const app = require("./app");
+const config = require("./config");
 
 app.listen(config.server.port, config.server.host, () => {
   console.log(

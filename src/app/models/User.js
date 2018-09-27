@@ -1,11 +1,11 @@
-import mongoose, { Schema } from "mongoose";
-import { updateDate } from "~/src/app/database/utils";
-import passwordHash from "password-hash";
-
+const mongoose = require("mongoose");
+const { updateDate } = require("../database/utils");
+const passwordHash = require("password-hash");
+const { Schema } = mongoose;
 /**
  * Required input validation e.g. email, name
  */
-export const schema = new Schema({
+const schema = new Schema({
   username: { type: String, required: true, unique: true },
   // Always store username in lower case
   name: { type: String, required: true, lowercase: true },
@@ -23,6 +23,4 @@ export const schema = new Schema({
 
 schema.pre("save", updateDate);
 
-const Model = mongoose.model("User", schema);
-
-export default Model;
+module.exports = mongoose.model("User", schema);

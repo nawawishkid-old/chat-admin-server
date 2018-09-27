@@ -1,33 +1,31 @@
-import express from "express";
-import bodyParser from "body-parser";
-import authRoute from "./routes/auth";
-import apiRoutes from "./routes/api/index";
+const express = require("express");
+const bodyParser = require("body-parser");
+const authRoute = require("./routes/auth");
+const apiRoutes = require("./routes/api/index");
+const {
+  withAuth,
+  withCreatorId,
+  withLogger,
+  withCors
+} = require("./middlewares");
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
-  console.log(`${req.method.toUpperCase()} ${req.path}`);
-	console.log('req.body: ', req.body);
-  next();
-});
-
-app.use((req, res, next) => {
-  res.set({
-    "Access-Control-Allow-Origin": "*",
-    // "Access-Control-Allow-Methods": "*",
-    "Access-Control-Allow-Headers": "*"
-  });
-  next();
-});
+app.use(withLogger);
+// app.use(withCors);
 
 // app.use("/api/selenium", routes.api.selenium);
-app.use("/api/template/parser", apiRoutes.templateParser);
-app.use("/api/template/input", apiRoutes.templateInput);
+app.use("/api/template/parser", withAuth, apiRoutes.templateParser);
+app.use(
+  "/api/template/input",
+  withAuth,
+  withCreatorId,
+  apiRoutes.templateInput
+);
 app.use("/api/template", apiRoutes.template);
-app.use("/api/users", apiRoutes.user);
+app.use("/api/users", withAuth, apiRoutes.user);
 app.use("/auth", authRoute);
 
-export default app;
+module.exports = app;

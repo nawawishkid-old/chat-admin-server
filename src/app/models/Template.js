@@ -1,10 +1,12 @@
-import mongoose, { Schema } from "mongoose";
-import { updateDate } from "~/src/app/database/utils";
+const mongoose = require("mongoose");
+const { updateDate } = require("../database/utils");
+
+const { Schema } = mongoose;
 
 /**
  * User need to create template's input before create a template.
  */
-export const schema = new Schema({
+const schema = new Schema({
   name: { type: String, required: true, index: true },
   content: { type: String, required: true },
   openTag: { type: String, required: true },
@@ -26,6 +28,4 @@ export const schema = new Schema({
 
 schema.pre("save", updateDate);
 
-export const Model = mongoose.model("Template", schema);
-
-export default Model;
+module.exports = mongoose.model("Template", schema);

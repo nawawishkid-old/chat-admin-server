@@ -1,9 +1,9 @@
-export const server = {
+exports.server = {
   host: "localhost",
   port: "11112"
 };
 
-export const db = {
+exports.db = {
   host: "localhost",
   port: "27017",
   name: "test",
@@ -11,7 +11,7 @@ export const db = {
   password: "adminAtTest"
 };
 
-export const logger = {
+exports.logger = {
   app: {
     level: "debug",
     label: "App"
@@ -34,13 +34,6 @@ export const logger = {
   }
 };
 
-export const SECRET_KEY = "secretKey";
-export const ACCESS_TOKEN_LIFESPAN = 60 * 60;
-export const REFRESH_TOKEN_LIFESPAN = 60 * 30;
-
-export default {
-  server,
-  db,
-  logger,
-  SECRET_KEY
-};
+exports.SECRET_KEY = "secretKey";
+exports.ACCESS_TOKEN_LIFESPAN = 60 * 60;
+exports.REFRESH_TOKEN_LIFESPAN = 60 * 30;

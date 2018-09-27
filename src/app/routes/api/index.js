@@ -1,6 +1,4 @@
-import user from "./user";
-import template from "./template";
-import templateInput from "./templateInput";
-import templateParser from "./templateParser";
-
-export default { user, template, templateInput, templateParser };
+exports.template = require("./template");
+exports.templateInput = require("./templateInput");
+exports.templateParser = require("./templateParser");
+exports.user = require("./user");

@@ -1,10 +1,8 @@
-import db from "~/src/app/database";
-import TemplateInput from "../models/TemplateInput";
-
-const ctrl = {};
+const db = require("../database");
+const TemplateInput = require("../models/TemplateInput");
 
 // Get
-ctrl.get = (req, res) => {
+exports.get = (req, res) => {
   db.connect();
   console.log("templateInput.get()");
   console.log("params: ", req.params);
@@ -30,7 +28,7 @@ ctrl.get = (req, res) => {
 };
 
 // Create
-ctrl.create = (req, res) => {
+exports.create = (req, res) => {
   db.connect();
   console.log("body: ", req.body);
   // const { name, label, options, componentScheme, accessToken } = req.body;
@@ -52,7 +50,7 @@ ctrl.create = (req, res) => {
 };
 
 // Update
-ctrl.update = (req, res) => {
+exports.update = (req, res) => {
   db.connect();
   const { name, label, options, componentScheme } = req.body;
   const newDoc = { name, label, options, componentScheme };
@@ -85,7 +83,7 @@ ctrl.update = (req, res) => {
 };
 
 // Delete
-ctrl.delete = (req, res) => {
+exports.delete = (req, res) => {
   db.connect();
   TemplateInput.findByIdAndRemove(req.params.id, (err, doc) => {
     if (err) {
@@ -101,5 +99,3 @@ ctrl.delete = (req, res) => {
     });
   });
 };
-
-export default ctrl;

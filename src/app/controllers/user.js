@@ -1,7 +1,5 @@
-import db from "~/src/app/database";
-import User from "../models/User";
-
-const ctrl = {};
+const db = require("../database");
+const User = require("../models/User");
 
 /**
  * Get user.
@@ -9,7 +7,7 @@ const ctrl = {};
  * @param {Object} req Express.js's Request object
  * @param {Object} res Express.js's Response object
  */
-ctrl.get = (req, res) => {
+exports.get = (req, res) => {
   db.connect();
   if (req.params.id === undefined) {
     res.status(422).json({
@@ -39,7 +37,7 @@ ctrl.get = (req, res) => {
  * @param {Object} req Express.js's Request object
  * @param {Object} res Express.js's Response object
  */
-ctrl.create = (req, res) => {
+exports.create = (req, res) => {
   db.connect();
   const { username, name, email, password } = req.body;
   const user = new User({
@@ -71,7 +69,7 @@ ctrl.create = (req, res) => {
  * @param {Object} req Express.js's Request object
  * @param {Object} res Express.js's Response object
  */
-ctrl.update = (req, res) => {
+exports.update = (req, res) => {
   db.connect();
   User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
     if (err) {
@@ -94,7 +92,7 @@ ctrl.update = (req, res) => {
  * @param {Object} req Express.js's Request object
  * @param {Object} res Express.js's Response object
  */
-ctrl.delete = (req, res) => {
+exports.delete = (req, res) => {
   db.connect();
   User.findByIdAndRemove(req.params.id, (err, obj) => {
     if (err || obj === null) {
@@ -110,5 +108,3 @@ ctrl.delete = (req, res) => {
     });
   });
 };
-
-export default ctrl;

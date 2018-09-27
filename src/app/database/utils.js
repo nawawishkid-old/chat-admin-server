@@ -1,4 +1,4 @@
-export function updateDate(next) {
+module.exports = function updateDate(next) {
   const now = new Date();
 
   this.updated_at = now;
@@ -8,6 +8,4 @@ export function updateDate(next) {
   }
 
   next();
-}
-
-export default { updateDate };
+};

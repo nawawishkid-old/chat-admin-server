@@ -1,23 +1,21 @@
-import { Router } from "express";
-import ctrl from "~/src/app/controllers/template";
-import authMiddleware from "../middlewares/auth";
-import attachCreatorId from "~/src/app/middlewares/attachCreatorId";
-
+const { Router } = require("express");
+const ctrl = require("../../controllers/template");
+const withRequestBodyFilter = require("../../middlewares/withRequestBodyFilter");
+const withCors = require("../../middlewares/withCors");
 const router = Router();
+const requestBodyFilter = withRequestBodyFilter.create("inputs");
 
-// Get
-router.get("/:id?", authMiddleware, attachCreatorId, ctrl.get); // tested
+router.options("/", withCors);
 
-// Create
-router.post("/", authMiddleware, attachCreatorId, ctrl.create); // tested
+router.get("/:id?", withCors, ctrl.get);
 
-// Update
-router.post("/update/:id", authMiddleware, attachCreatorId, ctrl.update);
-router.put("/:id", authMiddleware, attachCreatorId, ctrl.update);
-router.patch("/:id", authMiddleware, attachCreatorId, ctrl.update);
+router.post("/", requestBodyFilter, ctrl.create);
 
-// Delete
-router.post("/delete/:id", authMiddleware, attachCreatorId, ctrl.delete);
-router.delete("/:id", authMiddleware, attachCreatorId, ctrl.delete);
+router.post("/update/:id", ctrl.update);
+router.put("/:id", ctrl.update);
+router.patch("/:id", ctrl.update);
 
-export default router;
+router.post("/delete/:id", ctrl.delete);
+router.delete("/:id", ctrl.delete);
+
+module.exports = router;

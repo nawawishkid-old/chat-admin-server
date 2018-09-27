@@ -91,7 +91,7 @@ const replaceContent = (content, datum) => {
   return theContent;
 };
 
-export default parser;
+exports = parser;
 
 // ===== Example usage. =====
 // const content = 'สวัสดี[[suffix]]คุณลูกค้า {{shopName}} ยินดีให้บริการ{{suffix}}'

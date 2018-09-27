@@ -1,28 +1,25 @@
-import { Router } from "express";
-import ctrl from "~/src/app/controllers/user";
-import authMiddleware from "../../middlewares/auth";
-import filterRequestBody from "../../middlewares/filterRequestBody";
+const { Router } = require("express");
+const ctrl = require("../../controllers/user");
+const withRequestBodyFilter = require("../../middlewares/withRequestBodyFilter");
 
-const router = Router();
+const userRouter = Router();
 
-// Get
-router.get("/:id", authMiddleware, ctrl.get); // tested
+const requestBodyFilter = withRequestBodyFilter.create(
+  "username",
+  "password",
+  "email",
+  "name"
+);
 
-// Create
-router.post("/", ctrl.create); // tested
+userRouter.get("/:id", ctrl.get);
 
-// Update
-router.post("/update/:id", authMiddleware, ctrl.update); // tested
-router.put("/:id", authMiddleware, ctrl.update); // tested
-router.patch(
-  "/:id",
-  authMiddleware,
-  filterRequestBody("username", "password", "email", "name"),
-  ctrl.update
-); // tested
+userRouter.post("/", ctrl.create);
 
-// Delete
-router.post("/delete/:id", authMiddleware, ctrl.delete); // tested
-router.delete("/:id", authMiddleware, ctrl.delete); // tested
+userRouter.post("/update/:id", ctrl.update);
+userRouter.put("/:id", ctrl.update);
+userRouter.patch("/:id", requestBodyFilter, ctrl.update);
 
-export default router;
+userRouter.post("/delete/:id", ctrl.delete);
+userRouter.delete("/:id", ctrl.delete);
+
+module.exports = userRouter;

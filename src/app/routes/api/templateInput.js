@@ -1,42 +1,25 @@
-import { Router } from "express";
-import ctrl from "~/src/app/controllers/templateInput";
-import authMiddleware from "../middlewares/auth";
-import attachCreatorId from "~/src/app/middlewares/attachCreatorId";
-import getFilterRequestBody from "../../middlewares/filterRequestBody";
+const { Router } = require("express");
+const ctrl = require("../../controllers/templateInput");
+const withRequestBodyFilter = require("../../middlewares/withRequestBodyFilter");
 
-const filterRequestBody = getFilterRequestBody(
+const templateInputRouter = Router();
+
+const requestBodyFilter = withRequestBodyFilter.create(
   "name",
   "label",
   "componentScheme",
   "creatorId"
 );
-const router = Router();
 
-// Get
-router.get("/:id?", authMiddleware, attachCreatorId, ctrl.get);
+templateInputRouter.get("/:id?", ctrl.get);
 
-// Create
-router.post(
-  "/",
-  authMiddleware,
-  attachCreatorId,
-  filterRequestBody,
-  ctrl.create
-);
+templateInputRouter.post("/", requestBodyFilter, ctrl.create);
 
-// Update
-router.post(
-  "/update/:id",
-  authMiddleware,
-  attachCreatorId,
-  filterRequestBody,
-  ctrl.update
-);
-router.put("/:id", authMiddleware, attachCreatorId, ctrl.update);
-router.patch("/:id", authMiddleware, attachCreatorId, ctrl.update);
+templateInputRouter.post("/update/:id", requestBodyFilter, ctrl.update);
+templateInputRouter.put("/:id", requestBodyFilter, ctrl.update);
+templateInputRouter.patch("/:id", requestBodyFilter, ctrl.update);
 
-// Delete
-router.post("/delete/:id", authMiddleware, attachCreatorId, ctrl.delete);
-router.delete("/:id", authMiddleware, attachCreatorId, ctrl.delete);
+templateInputRouter.post("/delete/:id", ctrl.delete);
+templateInputRouter.delete("/:id", ctrl.delete);
 
-export default router;
+module.exports = templateInputRouter;

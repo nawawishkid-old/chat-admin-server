@@ -1,9 +1,10 @@
-import jwt from "jsonwebtoken";
-import { SECRET_KEY } from "~/src/app/config";
-import { getTokenFromHttpHeader } from "./utils";
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = require("../config");
+const { getTokenFromHttpHeader } = require("./utils");
 
-export default (req, res, next) => {
+module.exports = (req, res, next) => {
   console.log("[MIDDLEWARE] auth");
+  console.log("req.headers: ", req.headers);
   const token = getTokenFromHttpHeader(req.header("Authorization"));
 
   if (!token) {
