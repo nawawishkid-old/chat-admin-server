@@ -11,10 +11,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(withLogger);
 app.use(withCors);
 
-app.use("/api/template/parser", withAuth, apiRoutes.templateParser);
+app.use("/api/template/parser", apiRoutes.templateParser);
 app.use("/api/template/input", apiRoutes.templateInput);
 app.use("/api/template", apiRoutes.template);
-app.use("/api/users", withAuth, apiRoutes.user);
+app.use("/api/users", apiRoutes.user);
 app.use("/auth", authRoute);
 
 module.exports = app;
