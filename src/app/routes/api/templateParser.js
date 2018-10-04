@@ -1,5 +1,12 @@
 const { Router } = require("express");
 const ctrl = require("../../controllers/templateParser");
+const {
+  withAuth,
+  withRequestBodyFilter,
+  withCreatorId,
+  connectDB
+} = require("../../middlewares");
+
 
 const templateParserRouter = Router();
 

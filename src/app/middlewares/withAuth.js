@@ -4,29 +4,45 @@ const { getTokenFromHttpHeader } = require("./utils");
 
 module.exports = (req, res, next) => {
   console.log("[MIDDLEWARE] auth");
-  console.log("req.headers: ", req.headers);
+
   const token = getTokenFromHttpHeader(req.header("Authorization"));
 
   if (!token) {
-    res.sendStatus(403);
+    const errMsg =
+      "Error: Expected access token from Authorization header to be a string, but got " +
+      typeof token;
+
+    console.log("- " + errMsg);
+
+    res.status(403).json({
+      msg: errMsg
+    });
+
     return;
   }
 
+  console.log("- Verifying JWT...");
+
   jwt.verify(token, SECRET_KEY, (err, authData) => {
-    // console.log("authData: ", authData);
     if (err) {
+      const errMsg = "Unauthenticated";
+
+      console.log("- " + errMsg);
+
       res.set(
         "WWW-Authenticate",
         "Bearer realm='This is description of protected resource.'"
       );
       res.status(401).json({
-        msg: "Unauthenticated",
+        msg: errMsg,
         err: err
       });
+
       return;
     }
 
-    console.log("- Authenticated!");
+    console.log("- Authenticated");
+		console.log("- next...");
 
     next();
   });

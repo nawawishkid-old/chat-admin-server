@@ -3,9 +3,13 @@ exports.create = (...key) => {
     console.log("[MIDDLEWARE]: withRequestBodyFilter");
     const bodyKeys = Object.keys(req.body);
 
+    console.log("- Request body required these properties: ", key.join(", "));
+
     // Remove unrelated properties.
     bodyKeys.forEach(item => {
       if (key.indexOf(item) < 0) {
+        console.log("- Remove '" + item + "' from request body.");
+
         delete req.body[item];
       }
     });
@@ -19,6 +23,9 @@ exports.create = (...key) => {
       });
       return;
     }
+
+    console.log("- Request body has been validated");
+    console.log("- next...");
 
     next();
   };
