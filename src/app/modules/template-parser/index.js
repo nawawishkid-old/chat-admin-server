@@ -6,7 +6,7 @@
  * @param {String} open Parameter open tag.
  * @param {String} close Parameter closing tag.
  */
-exports.parser = (content, userParamsObj, open, close) => {
+module.exports = function(content, userParamsObj, open, close) {
   // Get all parameters from content
   const paramsObj = parseParamsFromContent(content, open, close);
 
