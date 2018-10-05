@@ -6,7 +6,7 @@
  * @param {String} open Parameter open tag.
  * @param {String} close Parameter closing tag.
  */
-const parser = (content, userParamsObj, open, close) => {
+exports.parser = (content, userParamsObj, open, close) => {
   // Get all parameters from content
   const paramsObj = parseParamsFromContent(content, open, close);
 
@@ -90,8 +90,6 @@ const replaceContent = (content, datum) => {
 
   return theContent;
 };
-
-exports = parser;
 
 // ===== Example usage. =====
 // const content = 'สวัสดี[[suffix]]คุณลูกค้า {{shopName}} ยินดีให้บริการ{{suffix}}'
