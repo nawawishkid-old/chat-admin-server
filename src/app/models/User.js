@@ -6,14 +6,13 @@ const { Schema } = mongoose;
  * Required input validation e.g. email, name
  */
 const schema = new Schema({
-  username: { type: String, required: true, unique: true },
+	username: { type: String, required: true, lowercase: true, unique: true },
   // Always store username in lower case
   name: { type: String, required: true, lowercase: true },
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true, lowercase: true, unique: true },
   password: {
     type: String,
     required: true,
-
     select: false,
     set: value => passwordHash.generate(value)
   },
