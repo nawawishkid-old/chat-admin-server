@@ -46,10 +46,15 @@ exports.create = (req, res) => {
 
   user.save(err => {
     if (err) {
-      res.status(422).json({
-        msg: "Failed to create: ",
-        err: err
-      });
+      let msg;
+
+      if (err.code === 11000) {
+        msg = `username '${req.body.name}' already exists.`;
+      } else {
+        msg = "Failed to create user.";
+      }
+
+      res.status(422).json({ msg, err });
 
       return;
     }

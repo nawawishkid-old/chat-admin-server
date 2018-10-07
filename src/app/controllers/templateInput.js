@@ -12,7 +12,7 @@ exports.get = (req, res) => {
   TemplateInput.find(condition, (err, doc) => {
     if (err) {
       res.status(500).json({
-        msg: "Database-related error occured.",
+        msg: "Database-related error occurred.",
         err: err
       });
       return;
@@ -40,10 +40,16 @@ exports.create = (req, res) => {
   TemplateInput.create(req.body, err => {
     if (err) {
       console.log("--- on save error: ", err);
-      res.status(422).json({
-        msg: "Failed to create: ",
-        err: err
-      });
+      let msg;
+
+      if (err.code === 11000) {
+        msg = `Template input name '${req.body.name}' already exists.`;
+      } else {
+        msg = "Failed to create template input.";
+      }
+
+      res.status(422).json({ msg, err });
+
       return;
     }
 

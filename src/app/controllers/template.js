@@ -14,7 +14,7 @@ exports.get = (req, res) => {
       console.log("EXECUTED.....................");
       if (err) {
         res.status(500).json({
-          msg: "Database-related error occured.",
+          msg: "Database-related error occurred.",
           err: err
         });
 
@@ -46,10 +46,16 @@ exports.create = (req, res) => {
   template.save(err => {
     if (err) {
       console.error("err: ", err);
-      res.status(422).json({
-        msg: "Failed to create: ",
-        err: err
-      });
+      let msg;
+
+      if (err.code === 11000) {
+        msg = `Template name '${req.body.name}' already exists.`;
+      } else {
+        msg = "Failed to create template.";
+      }
+
+      res.status(422).json({ msg, err });
+
       return;
     }
 
