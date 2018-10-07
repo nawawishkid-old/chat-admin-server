@@ -6,20 +6,32 @@ exports.get = (req, res) => {
 
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
+  condition.creatorId = req.body.creatorId;
+
   Template.find(condition)
     .populate("inputs")
     .exec((err, doc) => {
       console.log("EXECUTED.....................");
       if (err) {
+        res.status(500).json({
+          msg: "Database-related error occured.",
+          err: err
+        });
+
+        return;
+      }
+
+      if (doc.length === 0) {
         res.status(404).json({
           msg: "No entry found."
         });
+
         return;
       }
 
       res.json({
         msg: `Found ${doc.length} document(s).`,
-        data: { doc: doc.length > 1 ? doc : doc[0] }
+        data: { templates: doc }
       });
     });
 };

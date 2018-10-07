@@ -7,17 +7,28 @@ exports.get = (req, res) => {
   const condition =
     typeof req.params.id !== "undefined" ? { _id: req.params.id } : {};
 
+  condition.creatorId = req.body.creatorId;
+
   TemplateInput.find(condition, (err, doc) => {
     if (err) {
-      res.status(404).json({
-        msg: "No entry found."
+      res.status(500).json({
+        msg: "Database-related error occured.",
+        err: err
       });
+      return;
+    }
+
+    if (doc.length === 0) {
+      res.status(404).json({
+        msg: "TemplateInput not found."
+      });
+
       return;
     }
 
     res.json({
       msg: `Found ${doc.length} document(s).`,
-      data: { templateInput: doc.length > 1 ? doc : doc[0] }
+      data: { templateInputs: doc }
     });
   });
 };
