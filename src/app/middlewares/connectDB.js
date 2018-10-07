@@ -6,6 +6,6 @@ module.exports = (req, res, next) => {
   db.connect();
 
   console.log("- next...");
-
-  next();
+	
+	next();
 };
