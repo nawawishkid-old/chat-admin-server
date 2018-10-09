@@ -32,9 +32,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "babel src/app -d dist/app --retain-lines",
-    "run": "node dist/index.js",
-    "watch": "babel src/app -d dist/app --watch --retain-lines"
+    "start": "node src/index.js"
   },
   "author": "",
   "license": "ISC"

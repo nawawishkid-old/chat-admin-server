@@ -1,14 +1,14 @@
 exports.server = {
-  host: "localhost",
-  port: "11112"
+	host: process.env.CHATADMIN_SERVER_HOST || "0.0.0.0",
+  port: process.env.CHATADMIN_SERVER_PORT || 11112
 };
 
 exports.db = {
-  host: "localhost",
-  port: "27017",
-  name: "test",
-  username: "admin",
-  password: "adminAtTest"
+  host: process.env.CHATADMIN_DATABASE_HOST || "localhost",
+  port: process.env.CHATADMIN_DATABASE_PORT || "27017",
+  name: process.env.CHATADMIN_DATABASE_NAME || "test",
+  username: process.env.CHATADMIN_DATABASE_USERNAME || "admin",
+  password: process.env.CHATADMIN_DATABASE_PASSWORD || "adminAtTest"
 };
 
 exports.logger = {
