@@ -1,8 +1,12 @@
 const TemplateInput = require("../models/TemplateInput");
+const logger = require("../modules/loggers/controller");
+const dbLogger = require("../modules/loggers/database");
 
-// Get
+/**
+ * === GET ===
+ */
 exports.get = (req, res) => {
-  console.log("[CTRLLR]: templateInput.get()");
+  logger.debug("TemplateInput.get()");
 
   const condition =
     typeof req.params.id !== "undefined" ? { _id: req.params.id } : {};
@@ -10,97 +14,98 @@ exports.get = (req, res) => {
   condition.creatorId = req.body.creatorId;
 
   TemplateInput.find(condition, (err, doc) => {
+    let msg, status, data;
+
     if (err) {
-      res.status(500).json({
-        msg: "Database-related error occurred.",
-        err: err
-      });
-      return;
+      msg = "Database-related error occurred.";
+      status = 500;
+    } else if (doc.length === 0) {
+      msg = "Template input not found.";
+      status = 404;
+    } else {
+      msg = `Found ${doc.length} document(s).`;
+      status = 200;
+      data = { templateInputs: doc };
     }
 
-    if (doc.length === 0) {
-      res.status(404).json({
-        msg: "TemplateInput not found."
-      });
+    dbLogger.debug(msg);
 
-      return;
-    }
-
-    res.json({
-      msg: `Found ${doc.length} document(s).`,
-      data: { templateInputs: doc }
+    res.status(status).json({
+      msg,
+      data,
+      err
     });
   });
 };
 
-// Create
+/**
+ * === Create ===
+ */
 exports.create = (req, res) => {
-  console.log("[CTRLLR]: templateInput.create()");
+  logger.debug("TemplateInput.create()");
 
   TemplateInput.create(req.body, err => {
+    let msg, status;
+
     if (err) {
-      console.log("--- on save error: ", err);
-      let msg;
+      status = 422;
 
       if (err.code === 11000) {
         msg = `Template input name '${req.body.name}' already exists.`;
       } else {
         msg = "Failed to create template input.";
       }
-
-      res.status(422).json({ msg, err });
-
-      return;
+    } else {
+      msg = "Created successfully";
+      status = 201;
     }
 
-    res.status(201).json({
-      msg: "Created successfully"
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };
 
-// Update
+/**
+ * === Update ===
+ */
 exports.update = (req, res) => {
-  console.log("[CTRLLR]: templateInput.update()");
+  logger.debug("TemplateInput.update()");
 
-  const { name, label, options, componentScheme } = req.body;
-  const newDoc = { name, label, options, componentScheme };
-  console.log("options: ", newDoc.componentScheme.options);
-  console.log("newDoc: ", newDoc);
+  // const { name, label, options, componentScheme } = req.body;
+  // const newDoc = { name, label, options, componentScheme };
 
-  TemplateInput.findByIdAndUpdate(req.params.id, newDoc, (err, doc) => {
-    if (err) {
-      res.status(422).json({
-        msg: "Update failed",
-        err: err
-      });
-      return;
-    }
+  TemplateInput.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
+    const msg = err ? "Update failed" : "Updated";
+    const status = err ? 422 : 200;
 
-    console.log("Updated doc: ", doc);
+    dbLogger.debug(msg);
 
-    res.json({
-      msg: "Updated",
-      data: { templateInput: doc.length > 1 ? doc : doc[0] }
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };
 
-// Delete
+/**
+ * === DELETE ===
+ */
 exports.delete = (req, res) => {
-  console.log("[CTRLLR]: templateInput.delete()");
+  logger.debug("TemplateInput.delete()");
 
   TemplateInput.findByIdAndRemove(req.params.id, (err, doc) => {
-    if (err) {
-      res.status(422).json({
-        msg: "Delete failed",
-        err: err
-      });
-      return;
-    }
+    const msg = err ? "Delete failed" : "Deleted";
+    const status = err ? 422 : 200;
 
-    res.json({
-      msg: "Deleted"
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };

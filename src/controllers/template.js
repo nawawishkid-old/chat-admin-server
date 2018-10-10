@@ -1,8 +1,12 @@
 const Template = require("../models/Template");
+const logger = require("../modules/loggers/controller");
+const dbLogger = require("../modules/loggers/database");
 
-// Get
+/**
+ * === GET ===
+ */
 exports.get = (req, res) => {
-  console.log("[CTRLLR]: template.get()");
+  logger.debug("Template.get()");
 
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
@@ -11,97 +15,119 @@ exports.get = (req, res) => {
   Template.find(condition)
     .populate("inputs")
     .exec((err, doc) => {
-      console.log("EXECUTED.....................");
+      let msg, status, data;
+
       if (err) {
-        res.status(500).json({
-          msg: "Database-related error occurred.",
-          err: err
-        });
-
-        return;
+        msg = "Database-related error occurred.";
+        status = 500;
+      } else if (doc.length === 0) {
+        msg = "No entry found.";
+        status = 404;
+      } else {
+        msg = `Found ${doc.length} document(s).`;
+        status = 200;
+        data = { templates: doc };
       }
 
-      if (doc.length === 0) {
-        res.status(404).json({
-          msg: "No entry found."
-        });
+      dbLogger.debug(msg);
 
-        return;
-      }
-
-      res.json({
-        msg: `Found ${doc.length} document(s).`,
-        data: { templates: doc }
+      res.status(status).json({
+        msg,
+        data,
+        err
       });
     });
 };
 
-// Create
+/**
+ * === Create ===
+ */
 exports.create = (req, res) => {
-  console.log("[CTRLLR]: template.create()");
+  logger.debug("Template.create()");
 
-  // const { name, content, openTag, closingTag, inputs } = req.body;
-  const template = new Template(req.body);
+  const {
+    name,
+    content,
+    openTag,
+    closingTag,
+    inputs,
+    creatorId,
+    ...rest
+  } = req.body;
+  const newDoc = { name, content, openTag, closingTag, inputs, creatorId };
+
+  const template = new Template(newDoc);
 
   template.save(err => {
+    let msg, status;
+
     if (err) {
-      console.error("err: ", err);
-      let msg;
+      status = 422;
 
       if (err.code === 11000) {
         msg = `Template name '${req.body.name}' already exists.`;
       } else {
         msg = "Failed to create template.";
       }
-
-      res.status(422).json({ msg, err });
-
-      return;
+    } else {
+      msg = "Created successfully";
+      status = 201;
     }
 
-    res.json({
-      msg: "Created successfully"
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };
 
-// Update
+/**
+ * === Update ===
+ */
 exports.update = (req, res) => {
-  console.log("[CTRLLR]: template.update()");
+  logger.debug("Template.update()");
 
-  const { name, content, openTag, closingTag, inputs, ...rest } = req.body;
-  const newDoc = { name, content, openTag, closingTag, inputs };
+  const {
+    name,
+    content,
+    openTag,
+    closingTag,
+    inputs,
+    creatorId,
+    ...rest
+  } = req.body;
+  const newDoc = { name, content, openTag, closingTag, inputs, creatorId };
 
   Template.findByIdAndUpdate(req.params.id, newDoc, (err, doc) => {
-    if (err) {
-      res.status(422).json({
-        msg: "Update failed",
-        err: err
-      });
-      return;
-    }
+    const msg = err ? "Update failed" : "Updated";
+    const status = err ? 422 : 200;
 
-    res.json({
-      msg: "Updated"
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };
 
-// Delete
+/**
+ * === DELETE ===
+ */
 exports.delete = (req, res) => {
-  console.log("[CTRLLR]: template.delete()");
+  logger.debug("Template.delete()");
 
   Template.findByIdAndRemove(req.params.id, (err, doc) => {
-    if (err) {
-      res.status(422).json({
-        msg: "Delete failed",
-        err: err
-      });
-      return;
-    }
+    const msg = err ? "Delete failed" : "Deleted";
+    const status = err ? 422 : 200;
 
-    res.json({
-      msg: "Deleted"
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };

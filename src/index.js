@@ -1,4 +1,5 @@
-// require("babel-polyfill");
+require('dotenv').config();
+
 const app = require("./app");
 const { HOST, PORT } = require("./configs").app;
 

@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const authRoute = require("./routes/auth");
-const apiRoutes = require("./routes/api/index");
+const routes = require("./routes");
 const { withAuth, withLogger, withCors, setBaseUrl } = require("./middlewares");
 
 const app = express();
@@ -12,10 +11,10 @@ app.use(setBaseUrl);
 app.use(withLogger);
 app.use(withCors);
 
-app.use("/api/template/parser", apiRoutes.templateParser);
-app.use("/api/template/input", apiRoutes.templateInput);
-app.use("/api/template", apiRoutes.template);
-app.use("/api/users", apiRoutes.user);
-app.use("/auth", authRoute);
+app.use("/api/template/parser", routes.templateParser);
+app.use("/api/template/input", routes.templateInput);
+app.use("/api/template", routes.template);
+app.use("/api/users", routes.user);
+app.use("/auth", routes.auth);
 
 module.exports = app;

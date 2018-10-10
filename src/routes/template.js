@@ -1,18 +1,20 @@
 const { Router } = require("express");
-const ctrl = require("../../controllers/templateInput");
+const ctrl = require("../controllers/template");
 const {
   withAuth,
   withRequestBodyFilter,
   withCreatorId,
   connectDB
-} = require("../../middlewares");
+} = require("../middlewares");
 
 const router = Router();
 
 const requestBodyFilter = withRequestBodyFilter.create(
   "name",
-  "label",
-  "componentScheme",
+  "content",
+  "openTag",
+  "closingTag",
+  "inputs",
   "creatorId"
 );
 

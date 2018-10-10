@@ -1,17 +1,21 @@
-const jwt = require("jsonwebtoken");
-
 /**
  * Attach user id from HTTP Authorization token to request object to be used in template and templateInput controller
  */
 module.exports = (req, res, next) => {
-  console.log("[MIDDLEWARE]: withCreatorId");
+  const jwt = require("jsonwebtoken");
+  const logger = require("../modules/loggers/middleware");
+  const logName = "withCreatorId";
+  const logPrefix = logName + " - ";
+
+  logger.debug(logName);
+
   const userId = jwt.decode(req.header("Authorization").split(" ")[1]).sub;
 
   if (typeof userId !== "string") {
     const errorMsg =
       "- Error: Expected userId to be a string, " + typeof userId + " given.";
 
-    console.log(errorMsg);
+    logger.debug(logPrefix + errorMsg);
 
     res.status(422).json({
       msg: errorMsg
@@ -20,13 +24,11 @@ module.exports = (req, res, next) => {
     return;
   }
 
-  console.log("- Found userId: ", userId);
+  logger.debug(`${logPrefix}Found userId: %s`, userId);
 
   req.body.creatorId = userId;
 
-  // console.log("- req.body: ", req.body);
-  console.log("- UserId has been attached to request body.");
-  console.log("- next...");
+  logger.debug(`${logPrefix}UserId has been attached to request body.`);
 
   next();
 };
