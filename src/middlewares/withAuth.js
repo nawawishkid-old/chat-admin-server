@@ -8,13 +8,11 @@ module.exports = (req, res, next) => {
   const token = getTokenFromHttpHeader(req.header("Authorization"));
 
   if (!token) {
-    const errMsg =
-      "Error: Expected access token from Authorization header to be a string, but got " +
-      typeof token;
+    const errMsg = "Unauthenticated";
 
     console.log("- " + errMsg);
 
-    res.status(403).json({
+    res.status(401).json({
       msg: errMsg
     });
 
@@ -35,14 +33,14 @@ module.exports = (req, res, next) => {
       );
       res.status(401).json({
         msg: errMsg,
-        err: err
+        err
       });
 
       return;
     }
 
     console.log("- Authenticated");
-		console.log("- next...");
+    console.log("- next...");
 
     next();
   });
