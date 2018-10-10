@@ -9,7 +9,10 @@ module.exports = (req, res, next) => {
   let baseUrl = BASE_URL || "";
 
   req.url = req.url.slice(-1) === "/" ? req.url.slice(0, -1) : req.url;
-  req.url = baseUrl + req.url;
+  req.url =
+    req.url.slice(0, baseUrl.length) === baseUrl
+      ? req.url.slice(baseUrl.length)
+      : req.url;
 
   console.log("- set URL: ", req.url);
 
