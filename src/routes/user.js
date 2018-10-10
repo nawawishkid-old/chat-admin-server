@@ -1,10 +1,10 @@
 const { Router } = require("express");
-const ctrl = require("../../controllers/user");
+const ctrl = require("../controllers/user");
 const {
   withAuth,
   withRequestBodyFilter,
   connectDB
-} = require("../../middlewares");
+} = require("../middlewares");
 
 const userRouter = Router();
 
