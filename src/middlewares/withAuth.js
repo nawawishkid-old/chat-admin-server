@@ -1,16 +1,18 @@
-const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = require("../configs").app;
-const { getTokenFromHttpHeader } = require("./utils");
-
 module.exports = (req, res, next) => {
-  console.log("[MIDDLEWARE] auth");
-
+  const jwt = require("jsonwebtoken");
+  const { SECRET_KEY } = require("../configs").app;
+  const { getTokenFromHttpHeader } = require("./utils");
+  const logger = require("../modules/loggers/middleware");
+  const logName = "withAuth";
+  const logPrefix = logName + " - ";
   const token = getTokenFromHttpHeader(req.header("Authorization"));
+
+  logger.debug(logName);
 
   if (!token) {
     const errMsg = "Unauthenticated";
 
-    console.log("- " + errMsg);
+    logger.debug(logPrefix + errMsg);
 
     res.status(401).json({
       msg: errMsg
@@ -19,13 +21,11 @@ module.exports = (req, res, next) => {
     return;
   }
 
-  console.log("- Verifying JWT...");
-
   jwt.verify(token, SECRET_KEY, (err, authData) => {
     if (err) {
       const errMsg = "Unauthenticated";
 
-      console.log("- " + errMsg);
+      logger.debug(logPrefix + errMsg);
 
       res.set(
         "WWW-Authenticate",
@@ -39,8 +39,7 @@ module.exports = (req, res, next) => {
       return;
     }
 
-    console.log("- Authenticated");
-    console.log("- next...");
+    logger.debug(logPrefix + "Authenticated");
 
     next();
   });

@@ -1,10 +1,19 @@
-const { BASE_URL } = require("../configs").app;
-
 module.exports = (req, res, next) => {
-  console.log("[MIDDLEWARE] setBaseUrl");
+  const { BASE_URL } = require("../configs").app;
+  const logger = require("../modules/loggers/middleware");
+  const logName = "setBaseUrl";
+  const logPrefix = logName + " - ";
 
-  console.log("- original URL: ", req.url);
-  console.log("- baseUrl: ", BASE_URL);
+  logger.debug(logName);
+
+  logger.debug(`${logPrefix}original URL: %s`, req.url);
+  logger.debug(`${logPrefix}base URL: %s`, BASE_URL);
+
+  if (req.url === "/") {
+    next();
+
+    return;
+  }
 
   let baseUrl = BASE_URL || "";
 
@@ -14,7 +23,7 @@ module.exports = (req, res, next) => {
       ? req.url.slice(baseUrl.length)
       : req.url;
 
-  console.log("- set URL: ", req.url);
+  logger.debug(`${logPrefix}set URL: %s`, req.url);
 
   next();
 };

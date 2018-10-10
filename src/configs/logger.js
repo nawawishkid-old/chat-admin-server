@@ -1,8 +1,16 @@
+const { APP_ENV } = require("./app");
+const level = APP_ENV === "production" ? "info" : "debug";
+
 exports.app = {
-  level: "debug",
-  label: "App"
+  LEVEL: level,
+  LABEL: "App"
 };
+exports.middleware = {
+  LEVEL: level,
+  LABEL: "Middleware"
+};
+
 exports.api = {
-  level: "debug",
-  label: "API"
+  LEVEL: level,
+  LABEL: "API"
 };

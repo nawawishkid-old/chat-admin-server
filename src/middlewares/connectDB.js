@@ -1,11 +1,9 @@
 module.exports = (req, res, next) => {
-  console.log("[MIDDLEWARE]: connectDB");
-
+  const logger = require("../modules/loggers/middleware");
   const db = require("../database");
 
+  logger.debug("connectDB");
   db.connect();
 
-  console.log("- next...");
-	
-	next();
+  next();
 };

@@ -1,5 +1,9 @@
 module.exports = (req, res, next) => {
-  console.log("[MIDDLEWARE]: withCors");
+  const logger = require("../modules/loggers/middleware");
+  const logName = "withCors";
+  const logPrefix = logName + " - ";
+
+  logger.debug(logName);
 
   const headers = {
     "Access-Control-Allow-Origin": "*",
@@ -8,12 +12,10 @@ module.exports = (req, res, next) => {
   };
 
   Object.keys(headers).forEach(key =>
-    console.log("- " + key + ": " + headers[key])
+    logger.debug(`${logPrefix}${key}: ${headers[key]}`)
   );
 
   res.set(headers);
-
-	console.log("- next...");
 
   next();
 };
