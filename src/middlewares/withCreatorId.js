@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   const logName = "withCreatorId";
   const logPrefix = logName + " - ";
 
-  logger.debug(logName);
+  logger.verbose(logName);
 
   const userId = jwt.decode(req.header("Authorization").split(" ")[1]).sub;
 

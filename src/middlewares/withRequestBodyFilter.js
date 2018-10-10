@@ -4,7 +4,7 @@ exports.create = (...key) => {
     const logName = "withRequestBodyFilter";
     const logPrefix = logName + " - ";
 
-    logger.debug(logName);
+    logger.verbose(logName);
     const bodyKeys = Object.keys(req.body);
 
     logger.debug(

@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
   const logName = "setBaseUrl";
   const logPrefix = logName + " - ";
 
-  logger.debug(logName);
+  logger.verbose(logName);
 
   logger.debug(`${logPrefix}original URL: %s`, req.url);
   logger.debug(`${logPrefix}base URL: %s`, BASE_URL);

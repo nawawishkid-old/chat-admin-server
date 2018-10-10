@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   const logPrefix = logName + " - ";
   const token = getTokenFromHttpHeader(req.header("Authorization"));
 
-  logger.debug(logName);
+  logger.verbose(logName);
 
   if (!token) {
     const errMsg = "Unauthenticated: No token bearer.";

@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
     "user-agent"
   )}`;
 
-  logger.debug(logName);
+  logger.verbose(logName);
   logger.debug(`${logPrefix}${requestMsg}`);
   logger.debug(`${logPrefix}req.body: %s`, JSON.stringify(req.body));
   appLogger.info(requestMsg);
