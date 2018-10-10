@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const config = require("../config").db;
+const { HOST, PORT, NAME, USERNAME, PASSWORD } = require("../configs").db;
 
 exports.connect = () => {
   console.log("db.connect()");
@@ -13,9 +13,7 @@ exports.connect = () => {
   mongoose.set("debug", true);
 
   mongoose.connect(
-    `mongodb://${config.username}:${config.password}@${config.host}:${
-      config.port
-    }/${config.name}`,
+    `mongodb://${USERNAME}:${PASSWORD}@${HOST}:${PORT}/${NAME}`,
     {
       useNewUrlParser: true
     }

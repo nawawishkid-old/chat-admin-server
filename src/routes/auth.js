@@ -6,7 +6,7 @@ const {
   SECRET_KEY,
   ACCESS_TOKEN_LIFESPAN,
   REFRESH_TOKEN_LIFESPAN
-} = require("../config");
+} = require("../configs").app;
 const User = require("../models/User");
 const passwordHash = require("password-hash");
 

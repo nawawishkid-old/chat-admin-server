@@ -1,9 +1,9 @@
 // require("babel-polyfill");
 const app = require("./app");
-const config = require("./config");
+const { HOST, PORT } = require("./configs").app;
 
-app.listen(config.server.port, config.server.host, () => {
+app.listen(PORT, HOST, () => {
   console.log(
-    `Server listening at ${config.server.host}:${config.server.port}`
+    `Server listening at ${HOST}:${PORT}`
   );
 });
