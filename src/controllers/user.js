@@ -1,41 +1,50 @@
 const User = require("../models/User");
+const logger = require("../modules/loggers/controller");
+const dbLogger = require("../modules/loggers/database");
+const logName = "User";
+const logPrefix = logName + " - ";
 
 /**
- * Get user.
- *
- * @param {Object} req Express.js's Request object
- * @param {Object} res Express.js's Response object
+ * === GET ===
  */
 exports.get = (req, res) => {
+  logger.debug(logPrefix + "get()");
+
+  let msg, status, data;
+
   if (req.params.id === undefined) {
-    res.status(422).json({
-      msg: "User's id is required but not given."
-    });
+    msg = "User's id is required but not given.";
+    status = 422;
+
+    logger.warn(msg);
+
+    res.status(status).json({ msg });
+
     return;
   }
 
   User.findById(req.params.id, (err, doc) => {
     if (err || doc === null) {
-      res.status(404).json({
-        msg: "No entry found."
-      });
-      return;
+      msg = "No entry found.";
+      status = 404;
+    } else {
+      msg = "Found";
+      status = 200;
+      data = { user: doc };
     }
 
-    res.json({
-      msg: `Found.`,
-      data: { user: doc }
-    });
+    dbLogger.debug(msg);
+
+    res.status(status).json({ msg, data });
   });
 };
 
 /**
- * Create new user.
- *
- * @param {Object} req Express.js's Request object
- * @param {Object} res Express.js's Response object
+ * === Create ===
  */
 exports.create = (req, res) => {
+  logger.debug(logPrefix + "create()");
+
   const { username, name, email, password } = req.body;
   const user = new User({
     username,
@@ -45,66 +54,64 @@ exports.create = (req, res) => {
   });
 
   user.save(err => {
+    let msg, status;
+
     if (err) {
-      let msg;
+      status = 422;
 
       if (err.code === 11000) {
-        msg = `username '${req.body.name}' already exists.`;
+        msg = `Username '${req.body.name}' already exists.`;
       } else {
         msg = "Failed to create user.";
       }
-
-      res.status(422).json({ msg, err });
-
-      return;
+    } else {
+      msg = "Created successfully";
+      status = 201;
     }
 
-    res.json({
-      msg: "Created successfully"
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };
 
 /**
- * Update user. Handle both PUT and PATCH HTTP methods
- *
- * @param {Object} req Express.js's Request object
- * @param {Object} res Express.js's Response object
+ * === Update ===
  */
 exports.update = (req, res) => {
-  User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
-    if (err) {
-      res.status(422).json({
-        msg: "Update failed",
-        err: err
-      });
-      return;
-    }
+  logger.debug(logPrefix + "update()");
 
-    res.json({
-      msg: "Updated"
+  User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
+    const msg = err ? "Update failed" : "Updated";
+    const status = err ? 422 : 200;
+
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };
 
 /**
- * Delete user.
- *
- * @param {Object} req Express.js's Request object
- * @param {Object} res Express.js's Response object
+ * === DELETE ===
  */
 exports.delete = (req, res) => {
-  User.findByIdAndRemove(req.params.id, (err, obj) => {
-    if (err || obj === null) {
-      res.status(422).json({
-        msg: "Delete failed",
-        err: err
-      });
-      return;
-    }
+  logger.debug(logPrefix + "delete()");
 
-    res.json({
-      msg: "Deleted"
+  User.findByIdAndRemove(req.params.id, (err, doc) => {
+    const msg = err || !doc ? "Delete failed" : "Deleted";
+    const status = err || !doc ? 422 : 200;
+
+    dbLogger.debug(msg);
+
+    res.status(status).json({
+      msg,
+      err
     });
   });
 };

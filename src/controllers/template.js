@@ -71,7 +71,7 @@ exports.create = (req, res) => {
       }
     } else {
       msg = "Created successfully";
-      status = 200;
+      status = 201;
     }
 
     dbLogger.debug(msg);
