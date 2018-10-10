@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const { updateDate } = require("../database/utils");
 const Template = require("./Template");
-
 const { Schema } = mongoose;
 
 /*
@@ -27,11 +25,9 @@ const schema = new Schema({
     options: [{ label: String, value: String, isDefault: Boolean }]
   },
   creatorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  created_at: Date,
-  updated_at: Date
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now }
 });
-
-schema.pre("save", updateDate);
 
 /**
  * Remove deleted template input from template

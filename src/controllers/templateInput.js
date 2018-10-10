@@ -75,8 +75,7 @@ exports.create = (req, res) => {
 exports.update = (req, res) => {
   logger.debug("TemplateInput.update()");
 
-  // const { name, label, options, componentScheme } = req.body;
-  // const newDoc = { name, label, options, componentScheme };
+  req.body.updated_at = new Date();
 
   TemplateInput.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
     const msg = err ? "Update failed" : "Updated";

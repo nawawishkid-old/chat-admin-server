@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const { updateDate } = require("../database/utils");
-
 const { Schema } = mongoose;
 
 /**
@@ -22,10 +20,8 @@ const schema = new Schema({
     }
   ],
   creatorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  created_at: Date,
-  updated_at: Date
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now }
 });
-
-schema.pre("save", updateDate);
 
 module.exports = mongoose.model("Template", schema);

@@ -89,18 +89,9 @@ exports.create = (req, res) => {
 exports.update = (req, res) => {
   logger.debug("Template.update()");
 
-  const {
-    name,
-    content,
-    openTag,
-    closingTag,
-    inputs,
-    creatorId,
-    ...rest
-  } = req.body;
-  const newDoc = { name, content, openTag, closingTag, inputs, creatorId };
+  req.body.updated_at = new Date();
 
-  Template.findByIdAndUpdate(req.params.id, newDoc, (err, doc) => {
+  Template.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
     const msg = err ? "Update failed" : "Updated";
     const status = err ? 422 : 200;
 
