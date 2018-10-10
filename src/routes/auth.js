@@ -26,7 +26,7 @@ authRouter.post("/token", (req, res) => {
     .exec((err, doc) => {
       console.log("err: ", err, "doc: ", doc);
       if (err || doc === null) {
-        res.status(204).json({
+        res.status(401).json({
           msg: "Unauthenticated",
           err: err
         });

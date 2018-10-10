@@ -1,4 +1,3 @@
-const db = require("../database");
 const User = require("../models/User");
 
 /**
@@ -8,7 +7,6 @@ const User = require("../models/User");
  * @param {Object} res Express.js's Response object
  */
 exports.get = (req, res) => {
-  db.connect();
   if (req.params.id === undefined) {
     res.status(422).json({
       msg: "User's id is required but not given."
@@ -38,7 +36,6 @@ exports.get = (req, res) => {
  * @param {Object} res Express.js's Response object
  */
 exports.create = (req, res) => {
-  db.connect();
   const { username, name, email, password } = req.body;
   const user = new User({
     username,
@@ -49,11 +46,16 @@ exports.create = (req, res) => {
 
   user.save(err => {
     if (err) {
-      console.error("err: ", err);
-      res.status(422).json({
-        msg: "Failed to create: ",
-        err: err
-      });
+      let msg;
+
+      if (err.code === 11000) {
+        msg = `username '${req.body.name}' already exists.`;
+      } else {
+        msg = "Failed to create user.";
+      }
+
+      res.status(422).json({ msg, err });
+
       return;
     }
 
@@ -70,7 +72,6 @@ exports.create = (req, res) => {
  * @param {Object} res Express.js's Response object
  */
 exports.update = (req, res) => {
-  db.connect();
   User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
     if (err) {
       res.status(422).json({
@@ -93,7 +94,6 @@ exports.update = (req, res) => {
  * @param {Object} res Express.js's Response object
  */
 exports.delete = (req, res) => {
-  db.connect();
   User.findByIdAndRemove(req.params.id, (err, obj) => {
     if (err || obj === null) {
       res.status(422).json({

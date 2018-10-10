@@ -2,13 +2,15 @@ const db = require("../database");
 const Template = require("../models/Template");
 const templateParser = require("../modules/template-parser");
 
-console.log('tp: ', templateParser);
 
 // Get
 exports.get = (req, res) => {
   db.connect();
   console.log("body: ", req.body);
   console.log("query: ", req.query);
+
+	console.log('tp: ', templateParser);
+
 
   Template.findById(req.params.templateId, (err, doc) => {
     if (err) {

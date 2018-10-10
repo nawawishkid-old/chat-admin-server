@@ -16,7 +16,7 @@ const requestBodyFilter = withRequestBodyFilter.create(
   "creatorId"
 );
 
-const middlewares1 = [withAuth, connectDB];
+const middlewares1 = [withAuth, withCreatorId, connectDB];
 const middlewares2 = [withAuth, withCreatorId, requestBodyFilter, connectDB];
 
 router.get("/:id?", ...middlewares1, ctrl.get);

@@ -1,0 +1,40 @@
+version: '3.3'
+
+services:
+  nginx:
+    image: nginx
+    restart: on-failure
+    ports:
+      - "8000:80"
+    links:
+      - mongodb
+    volumes:
+      - ./docker/nginx/app.conf:/etc/nginx/conf.d/app.conf
+      - ./docker/nginx/log/app.access_log:/var/log/nginx/app.access_log
+      - ./docker/nginx/log/app.error_log:/var/log/nginx/app.error_log
+
+  mongodb:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: chatadmin
+    volumes:
+      - ./docker/mongo/initdb.js:/docker-entrypoint-initdb.d/initdb.js
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    environment:
+      MONGODB_USERNAME: root
+      MONGODB_PASSWORD: root
+      MONGODB_DATABASE: chatadmin
+      MONGODB_HOST: mongodb
+    ports:
+      - "9191:80"
+    links:
+      - mongodb
+      - nginx
+

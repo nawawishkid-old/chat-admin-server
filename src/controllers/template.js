@@ -6,20 +6,32 @@ exports.get = (req, res) => {
 
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
+  condition.creatorId = req.body.creatorId;
+
   Template.find(condition)
     .populate("inputs")
     .exec((err, doc) => {
       console.log("EXECUTED.....................");
       if (err) {
+        res.status(500).json({
+          msg: "Database-related error occurred.",
+          err: err
+        });
+
+        return;
+      }
+
+      if (doc.length === 0) {
         res.status(404).json({
           msg: "No entry found."
         });
+
         return;
       }
 
       res.json({
         msg: `Found ${doc.length} document(s).`,
-        data: { doc: doc.length > 1 ? doc : doc[0] }
+        data: { templates: doc }
       });
     });
 };
@@ -34,10 +46,16 @@ exports.create = (req, res) => {
   template.save(err => {
     if (err) {
       console.error("err: ", err);
-      res.status(422).json({
-        msg: "Failed to create: ",
-        err: err
-      });
+      let msg;
+
+      if (err.code === 11000) {
+        msg = `Template name '${req.body.name}' already exists.`;
+      } else {
+        msg = "Failed to create template.";
+      }
+
+      res.status(422).json({ msg, err });
+
       return;
     }
 

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { updateDate } = require("../database/utils");
+const Template = require("./Template");
 
 const { Schema } = mongoose;
 
@@ -31,5 +32,27 @@ const schema = new Schema({
 });
 
 schema.pre("save", updateDate);
+
+/**
+ * Remove deleted template input from template
+ *
+ * @see https://stackoverflow.com/questions/14348516/cascade-style-delete-in-mongoose
+ * @see https://mongoosejs.com/docs/middleware.html
+ * @see https://docs.mongodb.com/manual/reference/operator/update/pull/
+ */
+schema.pre("findOneAndRemove", function(next) {
+  const inputId = this._conditions._id;
+  const query = Template.update(
+    { inputs: { $in: [inputId] } },
+    { $pull: { inputs: inputId } },
+    { multi: true }
+  );
+
+  query.exec((...params) => {
+    console.log("params: ", params);
+  });
+
+  next();
+});
 
 module.exports = mongoose.model("TemplateInput", schema);
