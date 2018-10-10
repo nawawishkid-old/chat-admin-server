@@ -17,6 +17,7 @@ module.exports = (req, res, next) => {
 
   let baseUrl = BASE_URL || "";
 
+  baseUrl = baseUrl.slice(-1) === "/" ? baseUrl.slice(0, -1) : baseUrl;
   req.url = req.url.slice(-1) === "/" ? req.url.slice(0, -1) : req.url;
   req.url =
     req.url.slice(0, baseUrl.length) === baseUrl

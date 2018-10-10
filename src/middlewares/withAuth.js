@@ -1,6 +1,6 @@
 module.exports = (req, res, next) => {
   const jwt = require("jsonwebtoken");
-  const { SECRET_KEY } = require("../configs").app;
+  const { SECRET_KEY } = require("../configs/app");
   const { getTokenFromHttpHeader } = require("./utils");
   const logger = require("../modules/loggers/middleware");
   const logName = "withAuth";
@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
   logger.debug(logName);
 
   if (!token) {
-    const errMsg = "Unauthenticated";
+    const errMsg = "Unauthenticated: No token bearer.";
 
     logger.debug(logPrefix + errMsg);
 
@@ -23,7 +23,7 @@ module.exports = (req, res, next) => {
 
   jwt.verify(token, SECRET_KEY, (err, authData) => {
     if (err) {
-      const errMsg = "Unauthenticated";
+      const errMsg = "Unauthenticated: Invalid token.";
 
       logger.debug(logPrefix + errMsg);
 
