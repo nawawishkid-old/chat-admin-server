@@ -1,6 +1,6 @@
 const { createLogger, format, transports } = require("winston");
 const { combine, timestamp, label, splat, simple, printf } = format;
-const { LOG_DIR } = require("../../configs/app");
+const LOG_DIR = require("../../init").get("log directory");
 
 const customFormat = printf(
   info =>
