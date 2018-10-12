@@ -1,5 +1,5 @@
 module.exports = (req, res, next) => {
-  const { BASE_URL } = require("../configs").app;
+  const BASE_URL = require("../init").get("base url");
   const logger = require("../modules/loggers/middleware");
   const logName = "setBaseUrl";
   const logPrefix = logName + " - ";
