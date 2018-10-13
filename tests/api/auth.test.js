@@ -2,6 +2,8 @@ const app = require("./app");
 const { chai, should } = require("./utils");
 const testUser = require("./models/user");
 
+after(() => setTimeout(() => process.exit(0), 0));
+
 describe("POST auth/token", function() {
   this.timeout(5000);
 
@@ -64,4 +66,8 @@ describe("POST auth/token", function() {
         done();
       });
   });
+
+  /**
+   * It should not authenticate when the token is not expired, but its subject (user) has been removed
+   */
 });
