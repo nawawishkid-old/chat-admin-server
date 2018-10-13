@@ -5,7 +5,7 @@ const { withAuth } = require("./middlewares");
 
 const userRouter = Router();
 
-const requestBodyFilter = withRequestBodyFilter.create(
+const requestBodyFilter = withRequestBodyFilter(
   "username",
   "password",
   "email",
