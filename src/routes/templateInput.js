@@ -1,12 +1,11 @@
 const { Router } = require("express");
 const ctrl = require("../controllers/templateInput");
 const {
-  withAuth,
   withRequestBodyFilter,
   withCreatorId,
   connectDB
 } = require("../middlewares");
-
+const { withAuth } = require("./middlewares");
 const router = Router();
 
 const requestBodyFilter = withRequestBodyFilter.create(

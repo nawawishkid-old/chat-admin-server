@@ -50,11 +50,10 @@ exports.create = (req, res) => {
   } = req.body;
   const newDoc = { name, content, openTag, closingTag, inputs, creatorId };
 
-  const template = new Template(newDoc);
-
-  template.save(err => {
+  Template.create(newDoc, (err, doc) => {
     const { alreadyExists, createFailed } = require("./constants");
-    let status, json;
+    let status;
+    const json = {};
 
     if (err) {
       json.error = err;
@@ -68,6 +67,7 @@ exports.create = (req, res) => {
       }
     } else {
       status = 201;
+      json.data = { template: doc };
     }
 
     end(res, status, json);

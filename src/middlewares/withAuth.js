@@ -1,30 +1,26 @@
-module.exports = (req, res, next) => {
+module.exports = ({ secret }) => (req, res, next) => {
   const jwt = require("jsonwebtoken");
-  const SECRET_KEY = require("../init").get("secret");
   const { getTokenFromHttpHeader } = require("./utils");
-  const logger = require("../modules/loggers/middleware");
-  const logName = "withAuth";
-  const logPrefix = logName + " - ";
   const TOKEN = getTokenFromHttpHeader(req.header("Authorization"));
-
-  logger.verbose(logName);
 
   if (!TOKEN) {
     res.set("WWW-Authenticate", "Bearer realm='chat admin'");
-    res.sendStatus(401);
+    res.status(401).json({
+      msg: "Required JWT token"
+    });
 
     return;
   }
 
-  jwt.verify(TOKEN, SECRET_KEY, (err, authData) => {
+  jwt.verify(TOKEN, secret, (err, authData) => {
     if (err) {
       res.set("WWW-Authenticate", "Bearer realm='chat admin'");
-      res.sendStatus(401);
+      res.status(401).json({
+        msg: "Invalid JWT token"
+      });
 
       return;
     }
-
-    logger.debug(logPrefix + "Authenticated");
 
     next();
   });
