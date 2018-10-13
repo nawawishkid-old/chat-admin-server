@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const ctrl = require("../controllers/templateParser");
-const { withAuth, connectDB } = require("../middlewares");
-
+const { connectDB } = require("../middlewares");
+const { withAuth } = require("./middlewares");
 const router = Router();
 
 // Get

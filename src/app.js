@@ -1,17 +1,18 @@
 /**
  * Only server instantiation file should import this 'app' module.
- * 
+ *
  * If you want to configure Express instance before serving, use 'init' module instead.
  */
 
 const app = require("./init");
 const bodyParser = require("body-parser");
 const routes = require("./routes");
-const { withAuth, withLogger, withCors, setBaseUrl } = require("./middlewares");
+const { withLogger, withCors } = require("./middlewares");
+const { removeBaseUrl } = require("./routes/middlewares");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(setBaseUrl);
+app.use(removeBaseUrl);
 app.use(withLogger);
 app.use(withCors);
 

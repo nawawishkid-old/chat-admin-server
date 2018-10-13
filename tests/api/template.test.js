@@ -62,7 +62,7 @@ describe(`GET ${path}/:id?`, () => {
       .end((err, res) => {
         res.should.have.status(401);
         res.header.should.have.property("www-authenticate").that.is.a("string");
-        res.body.should.eql({});
+        // res.body.should.eql({});
 
         done();
       });
@@ -75,7 +75,7 @@ describe(`GET ${path}/:id?`, () => {
       .end((err, res) => {
         res.should.have.status(401);
         res.header.should.have.property("www-authenticate").that.is.a("string");
-        res.body.should.eql({});
+        // res.body.should.eql({});
 
         done();
       });
@@ -114,6 +114,29 @@ describe(`GET ${path}/:id?`, () => {
         res.body.data.should.have.property("templates").that.is.an("array");
         res.body.data.templates.length.should.eql(1);
         res.body.data.templates[0].should.have.property("creatorId", userId);
+      });
+  });
+});
+
+describe(`POST ${path}`, () => {
+  afterEach(async () => await testTemplate.remove());
+
+  /**
+   * ******************
+   * All users have been removed, but the token still valid. This is not proper.
+   * You should create new User before all 'it' in each 'describe'.
+   * ******************
+   */
+  it("should responds with 201 and created template document when creating a template", async () => {
+    await chai
+      .request(app)
+      .post(path)
+      .set("Authorization", "Bearer " + accessToken)
+      .send(Object.assign(testTemplate.data, { creatorId: userId }))
+      .then(res => {
+        res.should.have.status(201);
+        res.body.should.have.property("data").that.is.an("object");
+        res.body.data.should.have.property("template").that.is.an("object");
       });
   });
 });

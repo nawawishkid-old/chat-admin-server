@@ -1,12 +1,11 @@
 const { Router } = require("express");
 const ctrl = require("../controllers/template");
 const {
-  withAuth,
   withRequestBodyFilter,
   withCreatorId,
   connectDB
 } = require("../middlewares");
-
+const { withAuth } = require('./middlewares');
 const router = Router();
 
 const requestBodyFilter = withRequestBodyFilter.create(
@@ -19,7 +18,12 @@ const requestBodyFilter = withRequestBodyFilter.create(
 );
 
 const middlewares1 = [withAuth, withCreatorId, connectDB];
-const middlewares2 = [withAuth, withCreatorId, requestBodyFilter, connectDB];
+const middlewares2 = [
+  withAuth,
+  withCreatorId,
+  requestBodyFilter,
+  connectDB
+];
 
 router.get("/:id?", ...middlewares1, ctrl.get);
 
