@@ -1,8 +1,6 @@
 const app = require("./app");
 const { chai, should } = require("./utils");
-const testUser = require("./models/user");
-
-after(() => setTimeout(() => process.exit(0), 0));
+const { testUser } = require("../utils").models;
 
 describe("POST auth/token", function() {
   this.timeout(5000);
