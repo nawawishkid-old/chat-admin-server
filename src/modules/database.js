@@ -22,14 +22,14 @@ exports.connect = (options, callback = null) => async () => {
 
   const connection = mongoose.connection;
 
-  connection.on("error", err => {
-    console.log("Connection error: " + err);
-    console.log("Ready state: " + mongoose.connection.readyState);
-  });
-  connection.once("open", () => {
-    console.log("Connected to " + url);
-    console.log("Ready state: " + mongoose.connection.readyState);
-  });
+  // connection.on("error", err => {
+  //   console.log("Connection error: " + err);
+  //   console.log("Ready state: " + mongoose.connection.readyState);
+  // });
+  // connection.once("open", () => {
+  //   console.log("Connected to " + url);
+  //   console.log("Ready state: " + mongoose.connection.readyState);
+  // });
 
   return connection;
 };
