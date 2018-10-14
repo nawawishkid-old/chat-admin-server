@@ -1,18 +1,10 @@
-const {
-  should,
-  makeRequest,
-  makeResponse,
-  prefix,
-  getBody,
-  db
-} = require("./utils");
+const { should, makeRequest, makeResponse, getBody, db } = require("../utils");
+const { prefix } = require("./utils");
 const { getAccessToken } = require("../../src/controllers/auth");
-const testUser = require("../api/models/user");
+const { testUser } = require("../utils").models;
 const tokenLifespan = 60;
 const secret = "secret";
 const controller = getAccessToken({ tokenLifespan, secret });
-
-after(() => setTimeout(() => process.exit(0), 0));
 
 describe(`${prefix} auth.getAccessToken()()`, () => {
   before(async () => {
@@ -23,7 +15,7 @@ describe(`${prefix} auth.getAccessToken()()`, () => {
     db.disconnect();
   });
 
-  it("should responds with 200 and body.token when given username and passowrd is valid", async () => {
+  it("should responds with 200 and body.token when given username and password is valid", async () => {
     const user = await testUser.create().then(doc => doc);
     const req = makeRequest({
       body: { username: user.username, password: testUser.data.password }
