@@ -23,6 +23,7 @@
     "test": "mocha -C --recursive tests",
     "test-api": "mocha -C tests/api",
 		"test-middleware": "mocha -C tests/middleware/*.test.js",
+		"test-controller": "mocha -C tests/controller/*.test.js",
     "test-db": "mocha -C tests/database",
     "start": "node src/index.js"
   },
