@@ -1,18 +1,9 @@
-const app = require("../init");
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = app.get("secret");
-const ACCESS_TOKEN_LIFESPAN = app.get("access token lifespan");
-const REFRESH_TOKEN_LIFESPAN = app.get("refresh token lifespan");
 const User = require("../models/User");
 const passwordHash = require("password-hash");
-const logger = require("../modules/loggers/controller");
-const dbLogger = require("../modules/loggers/database");
-const logName = "Auth";
-const logPrefix = logName + " - ";
 
-exports.get = (req, res) => {
-  logger.debug(logPrefix + "get()");
-
+exports.getAccessToken = options => async (req, res) => {
+  const { tokenLifespan, secret } = options;
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -23,58 +14,58 @@ exports.get = (req, res) => {
     return;
   }
 
-  User.findOne({ username })
+  const handleThen = doc => {
+    if (!doc) {
+      handleUnauthenticated(res, { msg: "Unauthenticated" });
+
+      return;
+    }
+
+    if (!isPasswordMatched(res, password, doc.password)) {
+      return;
+    }
+
+    signToken(res, doc._id, secret, tokenLifespan);
+  };
+
+  await User.findOne({ username })
     .select("+password")
-    .exec((err, doc) => {
-      if (err || doc === null) {
-        dbLogger.warn("User not found");
+    .catch(err => {
+      handleUnauthenticated(res, { msg: "Unauthenticated", err });
+    })
+    .then(handleThen);
+};
 
-        res.set("WWW-Authenticate", "Bearer realm='chat admin'");
-				res.status(401).json({
-          msg: "Unauthenticated",
-          err
-        });
+const handleUnauthenticated = (res, json) => {
+  res.set("WWW-Authenticate", "Bearer realm='chat admin'");
+  res.status(401).json(json);
+};
+const isPasswordMatched = (res, givenPassword, fetchedPasswordHash) => {
+  const isAuth = passwordHash.verify(givenPassword, fetchedPasswordHash);
+
+  if (!isAuth) {
+    handleUnauthenticated(res, { msg: "Unauthenticated" });
+
+    return false;
+  }
+
+  return true;
+};
+const signToken = (res, userId, secret, tokenLifespan) => {
+  jwt.sign(
+    { sub: userId },
+    secret,
+    { expiresIn: tokenLifespan },
+    (err, token) => {
+      if (err) {
+        handleUnauthenticated(res, { msg: "JWT sign failed" });
 
         return;
       }
 
-      const hashedPassword = doc.password;
-      const isAuth = passwordHash.verify(password, hashedPassword);
-
-      if (!isAuth) {
-        logger.warn(logPrefix + "Password mismatch.");
-	
-				res.set("WWW-Authenticate", "Bearer realm='chat admin'");
-        res.status(401).json({
-          msg: "Unauthenticated"
-        });
-
-        return;
-      }
-
-      jwt.sign(
-        { sub: doc._id },
-        SECRET_KEY,
-        { expiresIn: ACCESS_TOKEN_LIFESPAN },
-        (err, token) => {
-          if (err) {
-            logger.warn(logPrefix + "Invalid JWT token.");
-
-						res.set("WWW-Authenticate", "Bearer realm='chat admin'");
-            res.status(401).json({
-              msg: "JWT sign failed",
-              err
-            });
-
-            return;
-          }
-
-          logger.debug(logPrefix + "Authenticated");
-
-          res.json({ token, msg: "Authenticated" });
-        }
-      );
-    });
+      res.json({ token, msg: "Access token issued successfully" });
+    }
+  );
 };
 
 // exports.refresh = (req, res) => {
