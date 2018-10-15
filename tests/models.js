@@ -7,7 +7,9 @@ const testTemplate = {
     name: "test1",
     content: "abc",
     openTag: "{{",
-    closingTag: "}}"
+    closingTag: "}}",
+    inputs: [],
+    creatorId: undefined
   },
   create: async data =>
     await Template.create(Object.assign(testTemplate.data, data)),
@@ -18,11 +20,13 @@ const testTemplateInput = {
   data: {
     name: "test1",
     label: "Test #1",
-    options: [],
+    options: {},
     componentScheme: {
       type: "text",
-      props: {}
-    }
+      props: {},
+      options: []
+    },
+    creatorId: undefined
   },
   create: async data =>
     await TemplateInput.create(Object.assign(testTemplateInput.data, data)),
