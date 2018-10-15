@@ -33,5 +33,12 @@ exports.db = {
   },
   disconnect: () => {
     require("mongoose").disconnect();
+  },
+  reset: async () => {
+    const user = require("../src/models/User").remove({});
+    const template = require("../src/models/Template").remove({});
+    const templateInput = require("../src/models/TemplateInput").remove({});
+
+    await Promise.all([user, template, templateInput]);
   }
 };
