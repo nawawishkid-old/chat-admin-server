@@ -3,32 +3,40 @@
  */
 module.exports = (req, res, next) => {
   const jwt = require("jsonwebtoken");
-  const logger = require("../modules/loggers/middleware");
-  const logName = "withCreatorId";
-  const logPrefix = logName + " - ";
+  const authHeader = req.header("Authorization");
 
-  logger.debug(logName);
-
-  const userId = jwt.decode(req.header("Authorization").split(" ")[1]).sub;
-
-  if (typeof userId !== "string") {
-    const errorMsg =
-      "- Error: Expected userId to be a string, " + typeof userId + " given.";
-
-    logger.debug(logPrefix + errorMsg);
-
-    res.status(422).json({
-      msg: errorMsg
+  if (!authHeader) {
+    res.set("WWW-Authenticate", "Bearer realm='chat admin'");
+    res.status(401).json({
+      msg: "Required JWT token"
     });
 
     return;
   }
 
-  logger.debug(`${logPrefix}Found userId: %s`, userId);
+  const decodedToken = jwt.decode(authHeader.split(" ")[1]);
+
+  if (!decodedToken) {
+    res.set("WWW-Authenticate", "Bearer realm='chat admin'");
+    res.status(401).json({
+      msg: "Invalid JWT token"
+    });
+
+    return;
+  }
+
+  const userId = decodedToken.sub;
+
+  if (!userId) {
+    res.set("WWW-Authenticate", "Bearer realm='chat admin'");
+    res.status(401).json({
+      msg: "Invalid JWT token"
+    });
+
+    return;
+  }
 
   req.body.creatorId = userId;
-
-  logger.debug(`${logPrefix}UserId has been attached to request body.`);
 
   next();
 };

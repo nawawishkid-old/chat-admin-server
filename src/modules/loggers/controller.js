@@ -1,4 +1,4 @@
 const { getLogger } = require("./utils");
-const { LEVEL, LABEL } = require("../../configs/logger").controller;
+const { LEVEL, LABEL } = require("../../init").get("log controller");
 
 module.exports = getLogger(LEVEL, LABEL);

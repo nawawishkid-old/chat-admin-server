@@ -1,13 +1,10 @@
 const Template = require("../models/Template");
-const logger = require("../modules/loggers/controller");
-const dbLogger = require("../modules/loggers/database");
+const { end } = require("./utils");
 
 /**
  * === GET ===
  */
 exports.get = (req, res) => {
-  logger.debug("Template.get()");
-
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
   condition.creatorId = req.body.creatorId;
@@ -15,27 +12,20 @@ exports.get = (req, res) => {
   Template.find(condition)
     .populate("inputs")
     .exec((err, doc) => {
-      let msg, status, data;
+      let status;
+      const json = {};
 
       if (err) {
-        msg = "Database-related error occurred.";
         status = 500;
+        json.error = err;
       } else if (doc.length === 0) {
-        msg = "No entry found.";
         status = 404;
       } else {
-        msg = `Found ${doc.length} document(s).`;
         status = 200;
-        data = { templates: doc };
+        json.data = { templates: doc };
       }
 
-      dbLogger.debug(msg);
-
-      res.status(status).json({
-        msg,
-        data,
-        err
-      });
+      end(res, status, json);
     });
 };
 
@@ -43,8 +33,6 @@ exports.get = (req, res) => {
  * === Create ===
  */
 exports.create = (req, res) => {
-  logger.debug("Template.create()");
-
   const {
     name,
     content,
@@ -56,30 +44,27 @@ exports.create = (req, res) => {
   } = req.body;
   const newDoc = { name, content, openTag, closingTag, inputs, creatorId };
 
-  const template = new Template(newDoc);
-
-  template.save(err => {
-    let msg, status;
+  Template.create(newDoc, (err, doc) => {
+    const { alreadyExists, createFailed } = require("./constants");
+    let status;
+    const json = {};
 
     if (err) {
-      status = 422;
+      json.error = err;
 
       if (err.code === 11000) {
-        msg = `Template name '${req.body.name}' already exists.`;
+        json.msg = alreadyExists.msg;
+        status = alreadyExists.code;
       } else {
-        msg = "Failed to create template.";
+        json.msg = createFailed.msg;
+        status = createFailed.code;
       }
     } else {
-      msg = "Created successfully";
       status = 201;
+      json.data = { template: doc };
     }
 
-    dbLogger.debug(msg);
-
-    res.status(status).json({
-      msg,
-      err
-    });
+    end(res, status, json);
   });
 };
 
@@ -87,29 +72,17 @@ exports.create = (req, res) => {
  * === Update ===
  */
 exports.update = (req, res) => {
-  logger.debug("Template.update()");
+  req.body.updated_at = new Date();
 
-  const {
-    name,
-    content,
-    openTag,
-    closingTag,
-    inputs,
-    creatorId,
-    ...rest
-  } = req.body;
-  const newDoc = { name, content, openTag, closingTag, inputs, creatorId };
+  Template.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
+    const { updateFailed, updated } = require("./constants");
+    const status = err ? updateFailed.code : updated.code;
 
-  Template.findByIdAndUpdate(req.params.id, newDoc, (err, doc) => {
-    const msg = err ? "Update failed" : "Updated";
-    const status = err ? 422 : 200;
+    if (err) {
+      res.status(status).json({ error: err });
+    }
 
-    dbLogger.debug(msg);
-
-    res.status(status).json({
-      msg,
-      err
-    });
+    res.sendStatus(status);
   });
 };
 
@@ -117,17 +90,13 @@ exports.update = (req, res) => {
  * === DELETE ===
  */
 exports.delete = (req, res) => {
-  logger.debug("Template.delete()");
-
   Template.findByIdAndRemove(req.params.id, (err, doc) => {
-    const msg = err ? "Delete failed" : "Deleted";
-    const status = err ? 422 : 200;
+    const status = err ? 422 : 204;
 
-    dbLogger.debug(msg);
+    if (err) {
+      res.status(status).json({ error: err });
+    }
 
-    res.status(status).json({
-      msg,
-      err
-    });
+    res.sendStatus(status);
   });
 };

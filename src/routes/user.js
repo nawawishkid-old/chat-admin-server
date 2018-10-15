@@ -1,14 +1,11 @@
 const { Router } = require("express");
 const ctrl = require("../controllers/user");
-const {
-  withAuth,
-  withRequestBodyFilter,
-  connectDB
-} = require("../middlewares");
+const { withRequestBodyFilter, connectDB } = require("../middlewares");
+const { withAuth } = require("./middlewares");
 
 const userRouter = Router();
 
-const requestBodyFilter = withRequestBodyFilter.create(
+const requestBodyFilter = withRequestBodyFilter(
   "username",
   "password",
   "email",

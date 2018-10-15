@@ -84,6 +84,8 @@ exports.create = (req, res) => {
 exports.update = (req, res) => {
   logger.debug(logPrefix + "update()");
 
+  req.body.updated_at = new Date();
+
   User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
     const msg = err ? "Update failed" : "Updated";
     const status = err ? 422 : 200;

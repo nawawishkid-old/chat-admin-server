@@ -3,7 +3,7 @@ module.exports = (req, res, next) => {
   const logName = "withCors";
   const logPrefix = logName + " - ";
 
-  logger.debug(logName);
+  logger.verbose(logName);
 
   const headers = {
     "Access-Control-Allow-Origin": "*",

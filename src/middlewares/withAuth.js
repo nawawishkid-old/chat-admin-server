@@ -1,45 +1,26 @@
-module.exports = (req, res, next) => {
+module.exports = ({ secret }) => (req, res, next) => {
   const jwt = require("jsonwebtoken");
-  const { SECRET_KEY } = require("../configs/app");
   const { getTokenFromHttpHeader } = require("./utils");
-  const logger = require("../modules/loggers/middleware");
-  const logName = "withAuth";
-  const logPrefix = logName + " - ";
-  const token = getTokenFromHttpHeader(req.header("Authorization"));
+  const TOKEN = getTokenFromHttpHeader(req.header("Authorization"));
 
-  logger.debug(logName);
-
-  if (!token) {
-    const errMsg = "Unauthenticated: No token bearer.";
-
-    logger.debug(logPrefix + errMsg);
-
+  if (!TOKEN) {
+    res.set("WWW-Authenticate", "Bearer realm='chat admin'");
     res.status(401).json({
-      msg: errMsg
+      msg: "Required JWT token"
     });
 
     return;
   }
 
-  jwt.verify(token, SECRET_KEY, (err, authData) => {
+  jwt.verify(TOKEN, secret, (err, authData) => {
     if (err) {
-      const errMsg = "Unauthenticated: Invalid token.";
-
-      logger.debug(logPrefix + errMsg);
-
-      res.set(
-        "WWW-Authenticate",
-        "Bearer realm='This is description of protected resource.'"
-      );
+      res.set("WWW-Authenticate", "Bearer realm='chat admin'");
       res.status(401).json({
-        msg: errMsg,
-        err
+        msg: "Invalid JWT token"
       });
 
       return;
     }
-
-    logger.debug(logPrefix + "Authenticated");
 
     next();
   });
