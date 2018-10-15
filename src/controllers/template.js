@@ -1,32 +1,35 @@
 const Template = require("../models/Template");
 const { end } = require("./utils");
 
+const getThen = res => doc => {
+  if (doc.length === 0) {
+    res.status(404).json({ msg: "Template not found" });
+
+    return doc;
+  }
+
+  res.status(200).json({ msg: "Template found", data: { templates: doc } });
+};
+
+const getCatch = res => err => {
+  res.status(422).json({ msg: "Database-related error", err });
+};
+
 /**
  * === GET ===
  */
-exports.get = (req, res) => {
+exports.get = async (req, res) => {
+  res.status(500);
+
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
-  condition.creatorId = req.body.creatorId;
-
-  Template.find(condition)
-    .populate("inputs")
-    .exec((err, doc) => {
-      let status;
-      const json = {};
-
-      if (err) {
-        status = 500;
-        json.error = err;
-      } else if (doc.length === 0) {
-        status = 404;
-      } else {
-        status = 200;
-        json.data = { templates: doc };
-      }
-
-      end(res, status, json);
-    });
+  /**
+   * *** Should separate .find() and .findOne() based on req.params.id
+   */
+  await Template.find(condition)
+    .exec()
+    .catch(getCatch(res))
+    .then(getThen(res));
 };
 
 /**
