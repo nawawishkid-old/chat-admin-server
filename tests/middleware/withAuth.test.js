@@ -1,8 +1,15 @@
-const httpMocks = require("node-mocks-http");
-const { should, prefix, getBody } = require("./utils");
+const {
+  should,
+  prefix,
+  next,
+  makeRequest,
+  makeResponse,
+  getBody
+} = require("./utils");
 const withAuth = require("../../src/middlewares/withAuth");
 const SECRET = "secret";
 const authMiddleware = withAuth({ secret: SECRET });
+let obj = { isNext: false };
 
 /**
  * Keep in mind that node-mocks-http is mocking node http
@@ -12,12 +19,12 @@ const authMiddleware = withAuth({ secret: SECRET });
  */
 describe(`${prefix}withAuth`, () => {
   it("should responds with 401, www-authenticate and 'Invalid JWT token' body.msg when invalid JWT token given.", () => {
-    const req = httpMocks.createRequest({
+    const req = makeRequest({
       headers: {
         Authorization: "Bearer abc.def.hij"
       }
     });
-    const res = httpMocks.createResponse();
+    const res = makeResponse();
 
     authMiddleware(req, res, null);
 
@@ -29,8 +36,8 @@ describe(`${prefix}withAuth`, () => {
   });
 
   it("should responds with 401, www-authenticate and 'Required JWT token' body.msg when no JWT token given.", () => {
-    const req = httpMocks.createRequest();
-    const res = httpMocks.createResponse();
+    const req = makeRequest();
+    const res = makeResponse();
 
     authMiddleware(req, res, null);
 
@@ -44,16 +51,15 @@ describe(`${prefix}withAuth`, () => {
   it("should call next() when valid JWT token given", () => {
     const jwt = require("jsonwebtoken");
     const token = jwt.sign({ sub: "abc" }, SECRET, { expiresIn: 60 });
-    const req = httpMocks.createRequest({
+    const req = makeRequest({
       headers: {
         Authorization: "Bearer " + token
       }
     });
-    const res = httpMocks.createResponse();
-		let isNext = false;
+    const res = makeResponse();
 
-    authMiddleware(req, res, () => { isNext = true; });
-    
-		isNext.should.be.true;
+    authMiddleware(req, res, next(obj));
+
+    obj.isNext.should.be.true;
   });
 });

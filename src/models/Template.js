@@ -7,18 +7,17 @@ const { Schema } = mongoose;
 const schema = new Schema({
   name: { type: String, required: true, index: true },
   content: { type: String, required: true },
-  openTag: { type: String, required: true },
-  closingTag: { type: String, required: true },
-  /**
-   * ***ATTENTION***
-   * Required: true is not working
-   */
-  inputs: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "TemplateInput"
-    }
-  ],
+  openTag: { type: String, default: "" }, // it's optional, that means user could just stores data, not necessary to parse it
+  closingTag: { type: String, default: "" },
+  inputs: {
+    type: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "TemplateInput"
+      }
+    ],
+    default: []
+  },
   creatorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }

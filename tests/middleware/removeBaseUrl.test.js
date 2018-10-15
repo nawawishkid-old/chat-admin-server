@@ -1,5 +1,4 @@
-const httpMocks = require("node-mocks-http");
-const { should, prefix, next, getBody } = require("./utils");
+const { should, prefix, next, makeRequest, getBody } = require("./utils");
 const removeBaseUrl = require("../../src/middlewares/removeBaseUrl");
 const baseUrl = "/base-url";
 let obj = { isNext: false };
@@ -12,7 +11,7 @@ describe(`${prefix}removeBaseUrl`, () => {
   it("should removes base URL when the base URL has trailing slash", () => {
     const path = "/";
     const baseUrlWithTrailingSlash = baseUrl + "/";
-    const req = httpMocks.createRequest({
+    const req = makeRequest({
       url: baseUrlWithTrailingSlash + path
     });
 
@@ -25,7 +24,7 @@ describe(`${prefix}removeBaseUrl`, () => {
   it("should removes base URL and strips trailing slash of the request URL", () => {
     const path = "/abc";
     const pathWithTrailingSlash = path + "/";
-    const req = httpMocks.createRequest({
+    const req = makeRequest({
       url: baseUrl + pathWithTrailingSlash
     });
 

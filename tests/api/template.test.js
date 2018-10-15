@@ -1,8 +1,6 @@
 const app = require("./app");
 const { chai, should } = require("./utils");
-const testUser = require("./models/user");
-const testTemplate = require("./models/template");
-const testTemplateInput = require("./models/templateInput");
+const { testUser, testTemplate, testTemplateInput } = require("../utils").models;
 const path = "/api/template";
 let accessToken, userId;
 const requestAccessToken = async () => {

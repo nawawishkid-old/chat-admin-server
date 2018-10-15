@@ -1,43 +1,35 @@
-exports.create = (...key) => {
-  return (req, res, next) => {
-    const logger = require("../modules/loggers/middleware");
-    const logName = "withRequestBodyFilter";
-    const logPrefix = logName + " - ";
+/**
+ * Remove unrelated request body property
+ * and check if it has all required properties
+ */
+module.exports = (...requiredKeys) => (req, res, next) => {
+  const bodyPropKeys = Object.keys(req.body);
+  const missedProps = [];
 
-    logger.verbose(logName);
-    const bodyKeys = Object.keys(req.body);
+  // Remove unrelated properties.
+  bodyPropKeys.forEach(item => {
+    if (requiredKeys.indexOf(item) < 0) {
+      delete req.body[item];
+    }
+  });
 
-    logger.debug(
-      `${logPrefix}Request body required these properties: %s`,
-      key.join(", ")
-    );
+  // Check required properties
+  requiredKeys.forEach(key => {
+    if (bodyPropKeys.indexOf(key) < 0) {
+      missedProps.push(key);
+    }
+  });
 
-    // Remove unrelated properties.
-    bodyKeys.forEach(item => {
-      if (key.indexOf(item) < 0) {
-        logger.debug(`${logPrefix}- Remove '${item}' from request body.`);
+  if (missedProps.length > 0) {
+    const msg = "Not enough data, required " + missedProps.join(",");
 
-        delete req.body[item];
-      }
+    res.status(422).json({
+      msg,
+      required: missedProps
     });
 
-    // Check required properties
-    const isInvalid = key.some(item => bodyKeys.indexOf(item) < 0);
+    return;
+  }
 
-    if (isInvalid) {
-      const msg = "Invalid argument";
-
-      logger.debug(logPrefix + msg);
-
-      res.status(422).json({
-        msg
-      });
-
-      return;
-    }
-
-    logger.debug(`${logPrefix}Request body has been validated`);
-
-    next();
-  };
+  next();
 };

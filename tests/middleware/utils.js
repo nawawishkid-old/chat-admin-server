@@ -1,5 +1,8 @@
 const should = require("chai").should();
+const httpMocks = require("node-mocks-http");
 const prefix = "[MIDDLEWARE] ";
+const makeRequest = (options = null) => httpMocks.createRequest(options);
+const makeResponse = (options = null) => httpMocks.createResponse(options);
 /**
  * Mock express' middleware next callback
  *
@@ -14,4 +17,11 @@ const getBody = res => {
   return data ? JSON.parse(data) : {};
 };
 
-module.exports = Object.freeze({ should, prefix, next, getBody });
+module.exports = Object.freeze({
+  should,
+  prefix,
+  next,
+  getBody,
+  makeRequest,
+  makeResponse
+});

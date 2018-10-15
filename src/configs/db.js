@@ -25,6 +25,7 @@ module.exports = app => {
     throwIfEmpty("Required database password")
   );
   const AUTH_SOURCE = env("CHATADMIN_DB_AUTH_SOURCE");
+  const DEBUG = env("CHATADMIN_DB_DEBUG", "off");
 
   app.set("mongodb host", HOST);
   app.set("mongodb port", PORT);
@@ -32,6 +33,7 @@ module.exports = app => {
   app.set("mongodb db username", USERNAME);
   app.set("mongodb db password", PASSWORD);
   app.set("mongodb auth source", AUTH_SOURCE);
+  app.set("mongodb debug", DEBUG);
 
   return app;
 };

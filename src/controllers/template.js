@@ -1,14 +1,10 @@
 const Template = require("../models/Template");
-const logger = require("../modules/loggers/controller");
-const dbLogger = require("../modules/loggers/database");
 const { end } = require("./utils");
 
 /**
  * === GET ===
  */
 exports.get = (req, res) => {
-  logger.debug("Template.get()");
-
   const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
 
   condition.creatorId = req.body.creatorId;
@@ -37,8 +33,6 @@ exports.get = (req, res) => {
  * === Create ===
  */
 exports.create = (req, res) => {
-  logger.debug("Template.create()");
-
   const {
     name,
     content,
@@ -78,8 +72,6 @@ exports.create = (req, res) => {
  * === Update ===
  */
 exports.update = (req, res) => {
-  logger.debug("Template.update()");
-
   req.body.updated_at = new Date();
 
   Template.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
@@ -98,8 +90,6 @@ exports.update = (req, res) => {
  * === DELETE ===
  */
 exports.delete = (req, res) => {
-  logger.debug("Template.delete()");
-
   Template.findByIdAndRemove(req.params.id, (err, doc) => {
     const status = err ? 422 : 204;
 

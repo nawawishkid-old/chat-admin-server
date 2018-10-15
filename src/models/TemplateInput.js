@@ -2,31 +2,42 @@ const mongoose = require("mongoose");
 const Template = require("./Template");
 const { Schema } = mongoose;
 
-/*
-{
-  name: String,
-  label: String,
-  options: Object, // Ant design field decorator
-  componentScheme: Object, // Data for creating React.Component
-  
-}
-*/
+const objValidator = value =>
+  typeof value === "object" && !Array.isArray(value);
+
+const componentScheme = new Schema({
+  type: {
+    type: String,
+    enum: ["text", "number", "select"],
+    required: true
+  },
+  props: {
+    type: Schema.Types.Mixed,
+    validate: {
+      validator: objValidator,
+      message: "'componentScheme.props' must be an object"
+    },
+    default: {}
+  },
+  options: [{ label: String, value: String, isDefault: Boolean }]
+});
+
 const schema = new Schema({
   name: { type: String, required: true, unique: true },
   label: { type: String, required: true },
-  options: Schema.Types.Mixed,
-  componentScheme: {
-    type: {
-      type: String,
-      enum: ["text", "number", "select"],
-      required: true
+  options: {
+    type: Schema.Types.Mixed,
+    validate: {
+      validator: objValidator,
+      message: "'options' must be an object"
     },
-    props: Schema.Types.Mixed,
-    options: [{ label: String, value: String, isDefault: Boolean }]
+    default: {}
   },
+  componentScheme: { type: componentScheme, required: true },
   creatorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   created_at: { type: Date, default: Date.now },
-  updated_at: { type: Date, default: Date.now }
+  updated_at: { type: Date, default: Date.now },
+  __v: { type: Number, select: false } // hide mongoose's built-in prop
 });
 
 /**
