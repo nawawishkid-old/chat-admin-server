@@ -31,22 +31,22 @@ const parseParamsFromContent = (content, open, close) => {
  *
  * @param {Object} paramsObj Object of parameters name and its token to be used in RegExp ({ name: token }). Parsed from user content.
  * @param {Object} userParamsObj Object of user-given parameter name and its value. { name: value }
- * @returns {Array} Array of { token, value } object
+ * @returns {Object} Object of { paramKey: { token, value } }
  */
-const filterUserParams = (paramsObj, userParamsObj) => {
+const matchUserParams = (paramsObj, userParamsObj) => {
   const paramKeys = Object.keys(paramsObj);
   const userParamKeys = Object.keys(userParamsObj);
-  const map = [];
+  const map = {};
   let index;
 
   userParamKeys.forEach(key => {
     index = paramKeys.indexOf(key);
 
     if (index > -1) {
-      map.push({
+      map[key] = {
         token: paramsObj[paramKeys[index]],
         value: userParamsObj[key]
-      });
+      };
     }
   });
 
@@ -57,23 +57,33 @@ const filterUserParams = (paramsObj, userParamsObj) => {
  * Replace all matches string.
  *
  * @param {String} content String content to be replaced with new value.
- * @param {Object[]} datum Array of object of token to be used in RegExp and values to be used to replace the content.
- * @returns {String} Replaced content.
+ * @param {Object} matchedParams Object of matched parameter's token to be used in RegExp, and values to be used to replace the content.
+ * @returns {Object} Content parsing information.
  */
-const replaceContent = (content, datum) => {
-  let theContent = content;
+const replaceContent = (content, contentParams, matchedParams = {}) => {
+  let theContent = "" + content;
   let regex;
+  const matchedParamKeys = Object.keys(matchedParams);
+  let isComplete = matchedParamKeys.length === 0 ? false : true;
+  const mismatched = matchedParamKeys.length === 0 ? contentParams : {};
 
-  datum.forEach(data => {
+  matchedParamKeys.forEach(paramKey => {
+    const data = matchedParams[paramKey];
     regex = new RegExp(data.token, "g");
-    theContent = theContent.replace(regex, data.value);
+
+    if (regex.test(theContent)) {
+      theContent = theContent.replace(regex, data.value);
+    } else {
+      isComplete = false;
+      mismatched[paramKey](contentParams[paramKey]);
+    }
   });
 
-  return theContent;
+  return { isComplete, content: theContent, mismatched };
 };
 
 module.exports = {
   parseParamsFromContent,
-  filterUserParams,
+  matchUserParams,
   replaceContent
 };

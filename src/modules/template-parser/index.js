@@ -1,6 +1,6 @@
 const {
   parseParamsFromContent,
-  filterUserParams,
+  matchUserParams,
   replaceContent
 } = require("./utils");
 
@@ -8,21 +8,19 @@ const {
  * String replacer
  *
  * @param {String} content Content string to be parsed.
- * @param {Object} userParamsObj Object of user-given parameter name and its value. { name: value }
+ * @param {Object} userParams Object of user-given parameter name and its value. { name: value }
  * @param {String} open Parameter open tag.
  * @param {String} close Parameter closing tag.
  */
-module.exports = function(content, userParamsObj, open, close) {
+module.exports = function(content, userParams, open, close) {
   // Get all parameters from content
-  const paramsObj = parseParamsFromContent(content, open, close);
+  const contentParams = parseParamsFromContent(content, open, close);
 
   // Filter unrelated params given by user
-  const paramsAndValues = filterUserParams(paramsObj, userParamsObj);
+  const matchedParams = matchUserParams(contentParams, userParams);
 
   // Actually replace the content string
-  const newContent = replaceContent(content, paramsAndValues);
-
-  return newContent;
+  return replaceContent(content, contentParams, matchedParams);
 };
 
 // ===== Example usage. =====
