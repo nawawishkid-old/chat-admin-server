@@ -1,119 +1,99 @@
 const User = require("../models/User");
-const logger = require("../modules/loggers/controller");
-const dbLogger = require("../modules/loggers/database");
-const logName = "User";
-const logPrefix = logName + " - ";
 
 /**
  * === GET ===
  */
-exports.get = (req, res) => {
-  logger.debug(logPrefix + "get()");
-
-  let msg, status, data;
+exports.get = async (req, res) => {
+  res.status(500);
 
   if (req.params.id === undefined) {
-    msg = "User's id is required but not given.";
-    status = 422;
-
-    logger.warn(msg);
-
-    res.status(status).json({ msg });
+    res.status(422).json({ msg: "User's id is required but not given" });
 
     return;
   }
 
-  User.findById(req.params.id, (err, doc) => {
-    if (err || doc === null) {
-      msg = "No entry found.";
-      status = 404;
-    } else {
-      msg = "Found";
-      status = 200;
-      data = { user: doc };
-    }
-
-    dbLogger.debug(msg);
-
-    res.status(status).json({ msg, data });
-  });
+  await User.findById(req.params.id)
+    .then(doc => {
+      if (doc === null) {
+        res.status(404).json({ msg: "User not found" });
+      } else {
+        res.status(200).json({ msg: "User found", data: { user: doc } });
+      }
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Failed to get user", err });
+    });
 };
 
 /**
  * === Create ===
  */
-exports.create = (req, res) => {
-  logger.debug(logPrefix + "create()");
+exports.create = async (req, res) => {
+  res.status(500);
 
-  const { username, name, email, password } = req.body;
-  const user = new User({
-    username,
-    name,
-    email,
-    password
-  });
-
-  user.save(err => {
-    let msg, status;
-
-    if (err) {
-      status = 422;
-
-      if (err.code === 11000) {
-        msg = `Username '${req.body.name}' already exists.`;
-      } else {
-        msg = "Failed to create user.";
-      }
-    } else {
-      msg = "Created successfully";
-      status = 201;
-    }
-
-    dbLogger.debug(msg);
-
-    res.status(status).json({
-      msg,
-      err
+  await User.create(req.body)
+    .then(doc => {
+      res.status(201).json({ msg: "User created", data: { user: doc } });
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Failed to create user", err });
     });
-  });
 };
-
 /**
  * === Update ===
  */
-exports.update = (req, res) => {
-  logger.debug(logPrefix + "update()");
-
+exports.update = async (req, res) => {
+  res.status(500);
   req.body.updated_at = new Date();
 
-  User.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
-    const msg = err ? "Update failed" : "Updated";
-    const status = err ? 422 : 200;
+  const condition = {
+    _id: req.params.id,
+    creatorId: req.body.creatorId
+  };
 
-    dbLogger.debug(msg);
+  delete req.body.creatorId;
 
-    res.status(status).json({
-      msg,
-      err
+  /**
+   * Must find by userId and creatorId.
+   * req.body.creatorId MUST be created only by the middleware.
+   *
+   * or
+   *
+   * accept access token instead of creatorId
+   * and then authenticate in the controller
+   *
+   * and
+   *
+   * don't forget to remove creatorId from req.body
+   * before updating user
+   * because you will accidentally change the owner of the user
+   */
+  await User.findOneAndUpdate(condition, req.body, { new: true })
+    .then(doc => {
+      if (doc === null) {
+        res.status(404).json({ msg: "User not found" });
+      } else {
+        res.status(200).json({ msg: "User updated", data: { user: doc } });
+      }
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Failed to update user", err });
     });
-  });
 };
 
 /**
  * === DELETE ===
  */
-exports.delete = (req, res) => {
-  logger.debug(logPrefix + "delete()");
-
-  User.findByIdAndRemove(req.params.id, (err, doc) => {
-    const msg = err || !doc ? "Delete failed" : "Deleted";
-    const status = err || !doc ? 422 : 200;
-
-    dbLogger.debug(msg);
-
-    res.status(status).json({
-      msg,
-      err
+exports.delete = async (req, res) => {
+  await User.findByIdAndRemove(req.params.id)
+    .then(doc => {
+      if (doc === null) {
+        res.status(404).json({ msg: "User not found" });
+      } else {
+        res.status(200).json({ msg: "User deleted", data: { user: doc } });
+      }
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Failed to delete user", err });
     });
-  });
 };

@@ -1,20 +1,13 @@
 const Template = require("../models/Template");
 const templateParser = require("../modules/template-parser");
-const logger = require("../modules/loggers/controller");
-const logName = "templateParser";
-const logPrefix = logName + " - ";
 
 // Get
-exports.get = (req, res) => {
-  logger.debug(logPrefix + "get()");
-
-  Template.findById(req.params.templateId, (err, doc) => {
-    let msg, status, data;
-
-    if (err) {
-      msg = "Could not find template.";
-      status = 404;
-    } else {
+exports.get = async (req, res) => {
+  await Template.findOne({
+    _id: req.params.templateId,
+    creatorId: req.body.creatorId
+  })
+    .then(doc => {
       const { content, closingTag, openTag } = doc;
       const newContent = templateParser(
         content,
@@ -23,16 +16,14 @@ exports.get = (req, res) => {
         closingTag
       );
 
-      msg = "Template parsed successfully.";
-      status = 200;
-      data = newContent;
-      
-			logger.debug(logPrefix + "parsed content: %s", newContent);
-    }
-
-    res.status(status).json({
-      msg,
-      data
+      res
+        .status(200)
+        .json({
+          msg: "Template parsed",
+          data: { parsedContent: newContent }
+        });
+    })
+    .catch(err => {
+      res.status(404).json({ msg: "Template not found" });
     });
-  });
 };
