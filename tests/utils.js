@@ -15,8 +15,9 @@ exports.next = obj => () => {
 };
 exports.getBody = res => {
   const data = res._getData();
+  const result = data ? JSON.parse(data) : {};
 
-  return data ? JSON.parse(data) : {};
+  return result;
 };
 exports.db = {
   connect: async () => {

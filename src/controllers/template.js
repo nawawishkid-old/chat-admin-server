@@ -1,102 +1,119 @@
 const Template = require("../models/Template");
-const { end } = require("./utils");
+const getThen = res => doc => {
+  if (doc === null || doc.length === 0) {
+    res.status(404).json({ msg: "Template not found" });
+
+    return doc;
+  }
+
+  const data = {};
+
+  if (Array.isArray(doc)) {
+    data.templates = doc;
+  } else {
+    data.template = doc;
+  }
+
+  res.status(200).json({ msg: "Template found", data });
+};
+
+const getCatch = res => err => {
+  res.status(422).json({ msg: "Failed to get template", err });
+};
 
 /**
  * === GET ===
  */
-exports.get = (req, res) => {
-  const condition = req.params.id !== undefined ? { _id: req.params.id } : {};
+exports.get = async (req, res) => {
+  res.status(500);
 
-  condition.creatorId = req.body.creatorId;
+  const { creatorId } = req.body;
+  const query = req.params.id
+    ? Template.findOne({ _id: req.params.id, creatorId })
+    : Template.find({ creatorId });
 
-  Template.find(condition)
-    .populate("inputs")
-    .exec((err, doc) => {
-      let status;
-      const json = {};
-
-      if (err) {
-        status = 500;
-        json.error = err;
-      } else if (doc.length === 0) {
-        status = 404;
-      } else {
-        status = 200;
-        json.data = { templates: doc };
-      }
-
-      end(res, status, json);
-    });
+  await query
+    .exec()
+    .then(getThen(res))
+    .catch(getCatch(res));
 };
 
 /**
  * === Create ===
  */
-exports.create = (req, res) => {
-  const {
-    name,
-    content,
-    openTag,
-    closingTag,
-    inputs,
-    creatorId,
-    ...rest
-  } = req.body;
-  const newDoc = { name, content, openTag, closingTag, inputs, creatorId };
+exports.create = async (req, res) => {
+  res.status(500);
 
-  Template.create(newDoc, (err, doc) => {
-    const { alreadyExists, createFailed } = require("./constants");
-    let status;
-    const json = {};
-
-    if (err) {
-      json.error = err;
-
-      if (err.code === 11000) {
-        json.msg = alreadyExists.msg;
-        status = alreadyExists.code;
-      } else {
-        json.msg = createFailed.msg;
-        status = createFailed.code;
-      }
-    } else {
-      status = 201;
-      json.data = { template: doc };
-    }
-
-    end(res, status, json);
-  });
+  await Template.create(req.body)
+    .then(doc => {
+      res
+        .status(201)
+        .json({ msg: "Template created", data: { template: doc } });
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Failed to create template", err });
+    });
 };
 
 /**
  * === Update ===
  */
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
+  res.status(500);
   req.body.updated_at = new Date();
 
-  Template.findByIdAndUpdate(req.params.id, req.body, (err, doc) => {
-    const { updateFailed, updated } = require("./constants");
-    const status = err ? updateFailed.code : updated.code;
+  const condition = {
+    _id: req.params.id,
+    creatorId: req.body.creatorId
+  };
 
-    if (err) {
-      res.status(status).json({ error: err });
-    }
+  delete req.body.creatorId;
 
-    res.sendStatus(status);
-  });
+  /**
+   * Must find by templateId and creatorId.
+   * req.body.creatorId MUST be created only by the middleware.
+   *
+   * or
+   *
+   * accept access token instead of creatorId
+   * and then authenticate in the controller
+   *
+   * and
+   *
+   * don't forget to remove creatorId from req.body
+   * before updating template
+   * because you will accidentally change the owner of the template
+   */
+  await Template.findOneAndUpdate(condition, req.body, { new: true })
+    .then(doc => {
+      if (doc === null) {
+        res.status(404).json({ msg: "Template not found" });
+      } else {
+        res
+          .status(200)
+          .json({ msg: "Template updated", data: { template: doc } });
+      }
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Failed to update template", err });
+    });
 };
 
 /**
  * === DELETE ===
  */
-exports.delete = (req, res) => {
-  Template.findByIdAndRemove(req.params.id, (err, doc) => {
-    const status = err ? 422 : 204;
-
-    if (err) {
-      res.status(status).json({ error: err });
-    }
-
-    res.sendStatus(status);
-  });
+exports.delete = async (req, res) => {
+  await Template.findByIdAndRemove(req.params.id)
+    .then(doc => {
+      if (doc === null) {
+        res.status(404).json({ msg: "Template not found" });
+      } else {
+        res
+          .status(200)
+          .json({ msg: "Template deleted", data: { template: doc } });
+      }
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Failed to delete template", err });
+    });
 };

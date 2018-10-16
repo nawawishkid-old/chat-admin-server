@@ -1,38 +1,46 @@
 const Template = require("../models/Template");
-const templateParser = require("../modules/template-parser");
-const logger = require("../modules/loggers/controller");
-const logName = "templateParser";
-const logPrefix = logName + " - ";
+const parseTemplate = require("../modules/template-parser");
 
 // Get
-exports.get = (req, res) => {
-  logger.debug(logPrefix + "get()");
+exports.get = async (req, res) => {
+  const { templateId } = req.params;
+  const { creatorId } = req.body;
 
-  Template.findById(req.params.templateId, (err, doc) => {
-    let msg, status, data;
-
-    if (err) {
-      msg = "Could not find template.";
-      status = 404;
-    } else {
-      const { content, closingTag, openTag } = doc;
-      const newContent = templateParser(
-        content,
-        req.query,
-        openTag,
-        closingTag
-      );
-
-      msg = "Template parsed successfully.";
-      status = 200;
-      data = newContent;
-      
-			logger.debug(logPrefix + "parsed content: %s", newContent);
-    }
-
-    res.status(status).json({
-      msg,
-      data
+  if (!templateId || !creatorId) {
+    res.status(422).json({
+      msg: "Parsing template required template ID and creator ID"
     });
-  });
+
+    return;
+  }
+
+  await Template.findOne({
+    _id: templateId,
+    creatorId
+  })
+    .then(doc => {
+      if (doc === null) {
+        res.status(404).json({ msg: "Template not found" });
+
+        return;
+      }
+
+      const { content, closingTag, openTag } = doc;
+      const result = parseTemplate(content, req.query, openTag, closingTag);
+
+      if (result.isComplete) {
+        res.status(200).json({
+          msg: "Template parsed",
+          data: { parsedContent: result.content }
+        });
+      } else {
+        res.status(422).json({
+          msg: "Parsed template is incomplete",
+          data: { required: result.mismatched }
+        });
+      }
+    })
+    .catch(err => {
+      res.status(422).json({ msg: "Could not parse template", err });
+    });
 };
