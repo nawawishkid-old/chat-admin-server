@@ -1,12 +1,12 @@
 const { should, makeRequest, makeResponse, getBody, db } = require("../utils");
-const { prefix } = require("./utils");
+const prefix = require("./utils").prefix + "[Auth]";
 const { getAccessToken } = require("../../src/controllers/auth");
 const { testUser } = require("../utils").models;
 const tokenLifespan = 60;
 const secret = "secret";
 const controller = getAccessToken({ tokenLifespan, secret });
 
-describe(`${prefix} auth.getAccessToken()()`, () => {
+describe(`${prefix} getAccessToken()()`, () => {
   before(async () => {
     await db.connect();
   });
