@@ -122,4 +122,15 @@ describe(`${prefix} get()`, () => {
       required.should.be.an("object");
     })
   );
+
+  testCase = createTestCase({
+    controller: ctrl.get,
+    status: 422,
+    message: "Parsing template required template ID and creator ID",
+    name: {
+      condition: "template ID or creator ID is not given"
+    }
+  });
+
+  it(testCase.name, testCase.getCallback());
 });
