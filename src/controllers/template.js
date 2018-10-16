@@ -1,6 +1,4 @@
 const Template = require("../models/Template");
-const { end } = require("./utils");
-
 const getThen = res => doc => {
   if (doc === null || doc.length === 0) {
     res.status(404).json({ msg: "Template not found" });

@@ -5,4 +5,3 @@ exports.withCors = require("./withCors");
 exports.withLogger = require("./withLogger");
 exports.connectDB = require("./connectDB");
 exports.removeBaseUrl = require("./removeBaseUrl");
-exports.getAuthToken = require("./getAuthToken");
