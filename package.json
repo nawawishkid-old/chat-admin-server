@@ -26,11 +26,13 @@
     "test-middleware": "mocha -C tests/middleware/*.test.js",
     "test-controller": "mocha -C tests/controller/*.test.js",
     "test-db": "mocha -C tests/database",
+    "test-module": "mocha -C tests/module",
     "cover": "nyc npm run test",
     "cover-api": "nyc npm run test-api",
     "cover-db": "nyc npm run test-db",
     "cover-middleware": "nyc npm run test-middleware",
-    "cover-controller": "nyc npm run test-controller"
+    "cover-controller": "nyc npm run test-controller",
+    "cover-module": "nyc npm run test-module"
   },
   "author": "",
   "license": "ISC"

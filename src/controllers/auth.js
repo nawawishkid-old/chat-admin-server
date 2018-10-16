@@ -59,11 +59,9 @@ const signToken = (res, userId, secret, tokenLifespan) => {
     (err, token) => {
       if (err) {
         handleUnauthenticated(res, { msg: "JWT sign failed" });
-
-        return;
+      } else {
+        res.json({ token, msg: "Access token issued successfully" });
       }
-
-      res.json({ token, msg: "Access token issued successfully" });
     }
   );
 };

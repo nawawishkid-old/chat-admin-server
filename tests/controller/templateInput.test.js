@@ -6,18 +6,18 @@ const {
   db,
   models
 } = require("../utils");
-const { User, Template, TemplateInput } = require("../../src/models");
+const { User, TemplateInput } = require("../../src/models");
 const {
   createTestCase,
   shouldResponds422IfInvalidId,
   shouldResponds404IfMismatchedId
 } = require("./utils");
-const prefix = require("./utils").prefix + "[Template]";
-const { testUser, testTemplate, testTemplateInput } = models;
-const ctrl = require("../../src/controllers/template");
+const prefix = require("./utils").prefix + "[TemplateInput]";
+const { testUser, testTemplateInput } = models;
+const ctrl = require("../../src/controllers/templateInput");
 
 describe(`${prefix} get()`, () => {
-  let userId, templateId, templateInputId, testCase;
+  let userId, templateInputId, testCase;
 
   before(async () => {
     await db.connect();
@@ -26,12 +26,6 @@ describe(`${prefix} get()`, () => {
 
     templateInputId = await TemplateInput.create({
       ...testTemplateInput.data,
-      creatorId: userId
-    }).then(doc => doc._id);
-
-    templateId = await Template.create({
-      ...testTemplate.data,
-      inputs: [templateInputId],
       creatorId: userId
     }).then(doc => doc._id.toString());
   });
@@ -45,7 +39,7 @@ describe(`${prefix} get()`, () => {
   testCase = createTestCase({
     controller: ctrl.get,
     status: 200,
-    message: "Template found",
+    message: "TemplateInput found",
     name: {
       condition: "there is at least one template exists",
       data: "all templates"
@@ -56,20 +50,20 @@ describe(`${prefix} get()`, () => {
   it(
     testCase.name,
     testCase.getCallback(res =>
-      getBody(res).data.templates.length.should.eql(1)
+      getBody(res).data.templateInputs.length.should.eql(1)
     )
   );
 
   testCase = createTestCase({
     controller: ctrl.get,
     status: 200,
-    message: "Template found",
+    message: "TemplateInput found",
     name: {
       condition: "template ID is specified",
       data: "one matched template object instead of array with single item"
     },
     request: store => ({
-      params: { id: templateId },
+      params: { id: templateInputId },
       body: { creatorId: userId }
     })
   });
@@ -77,18 +71,18 @@ describe(`${prefix} get()`, () => {
   it(
     testCase.name,
     testCase.getCallback((res, req, store) => {
-      const { template } = getBody(res).data;
+      const { templateInput } = getBody(res).data;
 
-      should.exist(template);
-      template.should.have.property("_id", templateId);
+      should.exist(templateInput);
+      templateInput.should.have.property("_id", templateInputId);
     })
   );
 
-  testCase = shouldResponds404IfMismatchedId("template", ctrl.get);
+  testCase = shouldResponds404IfMismatchedId("templateInput", ctrl.get);
 
   it(testCase.name, testCase.getCallback());
 
-  testCase = shouldResponds422IfInvalidId("template", ctrl.get, "get");
+  testCase = shouldResponds422IfInvalidId("templateInput", ctrl.get, "get");
 
   it(testCase.name, testCase.getCallback());
 });
@@ -104,18 +98,18 @@ describe(`${prefix} create()`, () => {
     db.disconnect();
   });
 
-  beforeEach(async () => await Template.remove({}));
+  beforeEach(async () => await TemplateInput.remove({}));
 
   testCase = createTestCase({
     controller: ctrl.create,
     status: 201,
-    message: "Template created",
+    message: "TemplateInput created",
     name: {
-      data: "created template",
+      data: "created templateInput",
       condition: "valid data given"
     },
     request: store => ({
-      body: { ...testTemplate.data, creatorId: store.creatorId }
+      body: { ...testTemplateInput.data, creatorId: store.creatorId }
     }),
     pre: async store => {
       store.creatorId = await User.create(testUser.data).then(doc =>
@@ -127,17 +121,17 @@ describe(`${prefix} create()`, () => {
   it(
     testCase.name,
     testCase.getCallback((res, req, store) => {
-      const { template } = getBody(res).data;
+      const { templateInput } = getBody(res).data;
 
-      should.exist(template);
-      template.should.have.property("creatorId", store.creatorId);
+      should.exist(templateInput);
+      templateInput.should.have.property("creatorId", store.creatorId);
     })
   );
 
   testCase = createTestCase({
     controller: ctrl.create,
     status: 422,
-    message: "Failed to create template",
+    message: "Failed to create templateInput",
     name: {
       condition: "invalid data given",
       data: "error object"
@@ -166,7 +160,7 @@ describe(`${prefix} update()`, () => {
     templateInputId = await TemplateInput.create({
       ...testTemplateInput.data,
       creatorId: userId
-    }).then(doc => doc._id);
+    }).then(doc => doc._id.toString());
   });
 
   after(async () => {
@@ -175,32 +169,32 @@ describe(`${prefix} update()`, () => {
     db.disconnect();
   });
 
-  beforeEach(async () => await Template.remove({}));
+  beforeEach(async () => await TemplateInput.remove({}));
 
   testCase = createTestCase({
     controller: ctrl.update,
     status: 200,
-    message: "Template updated",
+    message: "TemplateInput updated",
     name: {
-      data: "updated template",
+      data: "updated templateInput",
       condition: "valid data given"
     },
     request: store => {
       store.updatedName = "Updated name";
 
       return {
-        params: { id: store.templateId },
+        params: { id: store.templateInputId },
         body: { name: store.updatedName, creatorId: userId }
       };
     },
     pre: async store => {
       const newDoc = {
-        ...testTemplate.data,
+        ...testTemplateInput.data,
         inputs: [templateInputId],
         creatorId: userId
       };
 
-      store.templateId = await Template.create(newDoc).then(doc =>
+      store.templateInputId = await TemplateInput.create(newDoc).then(doc =>
         doc._id.toString()
       );
     }
@@ -209,19 +203,23 @@ describe(`${prefix} update()`, () => {
   it(
     testCase.name,
     testCase.getCallback((res, req, store) => {
-      const { template } = getBody(res).data;
+      const { templateInput } = getBody(res).data;
 
-      should.exist(template);
-      template.should.have.property("name", store.updatedName);
-      template.should.have.property("_id", store.templateId);
+      should.exist(templateInput);
+      templateInput.should.have.property("name", store.updatedName);
+      templateInput.should.have.property("_id", store.templateInputId);
     })
   );
 
-  testCase = shouldResponds404IfMismatchedId("template", ctrl.update);
+  testCase = shouldResponds404IfMismatchedId("templateInput", ctrl.update);
 
   it(testCase.name, testCase.getCallback());
 
-  testCase = shouldResponds422IfInvalidId("template", ctrl.update, "update");
+  testCase = shouldResponds422IfInvalidId(
+    "templateInput",
+    ctrl.update,
+    "update"
+  );
 
   it(testCase.name, testCase.getCallback());
 });
@@ -237,12 +235,6 @@ describe(`${prefix} delete()`, () => {
     templateInputId = await TemplateInput.create({
       ...testTemplateInput.data,
       creatorId: userId
-    }).then(doc => doc._id);
-
-    templateId = await Template.create({
-      ...testTemplate.data,
-      inputs: [templateInputId],
-      creatorId: userId
     }).then(doc => doc._id.toString());
   });
 
@@ -255,31 +247,39 @@ describe(`${prefix} delete()`, () => {
   testCase = createTestCase({
     controller: ctrl.delete,
     status: 200,
-    message: "Template deleted",
+    message: "TemplateInput deleted",
     name: {
-      data: "deleted template",
-      condition: "'req.params.id' match existing template"
+      data: "deleted templateInput",
+      condition: "'req.params.id' match existing templateInput"
     },
     request: store => ({
-      params: { id: templateId }
+      params: { id: templateInputId }
     })
   });
 
   it(
     testCase.name,
     testCase.getCallback(res => {
-      const { template } = getBody(res).data;
+      const { templateInput } = getBody(res).data;
 
-      should.exist(template);
-      template.should.have.property("_id", templateId);
+      should.exist(templateInput);
+      templateInput.should.have.property("_id", templateInputId);
     })
   );
 
-  testCase = shouldResponds404IfMismatchedId("template", ctrl.delete, "delete");
+  testCase = shouldResponds404IfMismatchedId(
+    "templateInput",
+    ctrl.delete,
+    "delete"
+  );
 
   it(testCase.name, testCase.getCallback());
 
-  testCase = shouldResponds422IfInvalidId("template", ctrl.delete, "delete");
+  testCase = shouldResponds422IfInvalidId(
+    "templateInput",
+    ctrl.delete,
+    "delete"
+  );
 
   it(testCase.name, testCase.getCallback());
 });

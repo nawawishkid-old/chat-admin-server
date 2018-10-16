@@ -22,6 +22,10 @@ const componentScheme = new Schema({
   options: [{ label: String, value: String, isDefault: Boolean }]
 });
 
+/**
+ * TemplateInput is meant to be data for creating user interface,
+ * we can parse Template without TemplateInput
+ */
 const schema = new Schema({
   name: { type: String, required: true, unique: true },
   label: { type: String, required: true },
@@ -56,7 +60,7 @@ schema.pre("findOneAndRemove", function(next) {
   );
 
   query.exec((...params) => {
-    console.log("params: ", params);
+    // console.log("params: ", params);
   });
 
   next();

@@ -23,4 +23,13 @@ const schema = new Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
+const autoPopulateInputs = function(next) {
+	this.populate('inputs');
+
+	next();
+}
+
+schema.pre('find', autoPopulateInputs);
+schema.pre('findOne', autoPopulateInputs);
+
 module.exports = mongoose.model("Template", schema);
