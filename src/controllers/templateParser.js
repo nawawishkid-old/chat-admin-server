@@ -1,29 +1,46 @@
 const Template = require("../models/Template");
-const templateParser = require("../modules/template-parser");
+const parseTemplate = require("../modules/template-parser");
 
 // Get
 exports.get = async (req, res) => {
+  const { templateId } = req.params;
+  const { creatorId } = req.body;
+
+  if (!templateId || !creatorId) {
+    res.status(422).json({
+      msg: "Parsing template required template ID and creator ID"
+    });
+
+    return;
+  }
+
   await Template.findOne({
-    _id: req.params.templateId,
-    creatorId: req.body.creatorId
+    _id: templateId,
+    creatorId
   })
     .then(doc => {
-      const { content, closingTag, openTag } = doc;
-      const newContent = templateParser(
-        content,
-        req.query,
-        openTag,
-        closingTag
-      );
+      if (doc === null) {
+        res.status(404).json({ msg: "Template not found" });
 
-      res
-        .status(200)
-        .json({
+        return;
+      }
+
+      const { content, closingTag, openTag } = doc;
+      const result = parseTemplate(content, req.query, openTag, closingTag);
+
+      if (result.isComplete) {
+        res.status(200).json({
           msg: "Template parsed",
-          data: { parsedContent: newContent }
+          data: { parsedContent: result.content }
         });
+      } else {
+        res.status(422).json({
+          msg: "Parsed template is incomplete",
+          data: { required: result.mismatched }
+        });
+      }
     })
     .catch(err => {
-      res.status(404).json({ msg: "Template not found" });
+      res.status(422).json({ msg: "Could not parse template", err });
     });
 };
