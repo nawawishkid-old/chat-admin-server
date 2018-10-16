@@ -2,6 +2,7 @@ const { should, makeRequest, makeResponse, getBody, db } = require("../utils");
 const prefix = require("./utils").prefix + "[Auth]";
 const { getAccessToken } = require("../../src/controllers/auth");
 const { testUser } = require("../utils").models;
+const User = require("../../src/models/User");
 const tokenLifespan = 60;
 const secret = "secret";
 const controller = getAccessToken({ tokenLifespan, secret });
@@ -16,14 +17,14 @@ describe(`${prefix} getAccessToken()()`, () => {
   });
 
   it("should responds with 200 and body.token when given username and password is valid", async () => {
-    const user = await testUser.create().then(doc => doc);
+    const user = await User.create(testUser.data).then(doc => doc);
     const req = makeRequest({
       body: { username: user.username, password: testUser.data.password }
     });
     const res = makeResponse();
 
     await controller(req, res);
-    await testUser.remove();
+    await User.remove({});
 
     const body = getBody(res);
 
@@ -59,7 +60,7 @@ describe(`${prefix} getAccessToken()()`, () => {
   });
 
   it("should responds with 401 when given username exists but password is incorrect", async () => {
-    const user = await testUser.create().then(doc => doc);
+    const user = await User.create(testUser.data).then(doc => doc);
     const req = makeRequest({
       body: { username: user.username, password: "fakePassword" }
     });
@@ -68,7 +69,7 @@ describe(`${prefix} getAccessToken()()`, () => {
     await controller(req, res);
 
     const body = getBody(res);
-    await testUser.remove();
+    await User.remove({});
 
     res.should.have.property("statusCode", 401);
     body.should.have.property("msg", "Unauthenticated");

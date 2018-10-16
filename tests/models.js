@@ -10,10 +10,7 @@ const testTemplate = {
     closingTag: "}}",
     inputs: [],
     creatorId: undefined
-  },
-  create: async data =>
-    await Template.create(Object.assign(testTemplate.data, data)),
-  remove: async () => await Template.remove({})
+  }
 };
 
 const testTemplateInput = {
@@ -27,10 +24,7 @@ const testTemplateInput = {
       options: []
     },
     creatorId: undefined
-  },
-  create: async data =>
-    await TemplateInput.create(Object.assign(testTemplateInput.data, data)),
-  remove: async () => await TemplateInput.remove({})
+  }
 };
 const testUser = {
   data: {
@@ -38,9 +32,7 @@ const testUser = {
     username: "test1",
     password: "test1",
     email: "test1@test.com"
-  },
-  create: async data => await User.create(Object.assign(testUser.data, data)),
-  remove: async () => await User.remove({})
+  }
 };
 
 module.exports = { testTemplate, testTemplateInput, testUser };

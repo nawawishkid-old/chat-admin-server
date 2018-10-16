@@ -2,13 +2,14 @@ const app = require("./app");
 const { chai, should } = require("./utils");
 const { db, models } = require("../utils");
 const { testUser } = models;
+const User = require("../../src/models/User");
 
 describe("POST auth/token", function() {
   this.timeout(5000);
 
   before(async () => {
     await db.connect();
-    await testUser.create();
+    await User.create(testUser.data);
   });
 
   after(async () => {

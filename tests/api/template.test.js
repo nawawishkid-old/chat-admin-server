@@ -2,10 +2,11 @@ const app = require("./app");
 const { chai, should } = require("./utils");
 const { db, models } = require("../utils");
 const { testUser, testTemplate, testTemplateInput } = models;
+const { User, Template, TemplateInput } = require("../../src/models");
 const path = "/api/template";
 let accessToken, userId;
 const requestAccessToken = async () => {
-  await testUser.create().then(doc => {
+  await User.create(testUser.data).then(doc => {
     userId = doc._id.toString();
   });
 
@@ -23,12 +24,14 @@ const requestAccessToken = async () => {
 };
 const createTemplate = async () => {
   // Create template input
-  const inputId = await testTemplateInput
-    .create({ creatorId: userId })
-    .then(doc => doc._id);
+  const inputId = await TemplateInput.create({
+    ...testTemplateInput.data,
+    creatorId: userId
+  }).then(doc => doc._id);
 
   // Create template
-  return await testTemplate.create({
+  return await Template.create({
+    ...testTemplate.data,
     inputs: [inputId],
     creatorId: userId
   });
@@ -96,7 +99,7 @@ describe(`GET ${path}/:id?`, () => {
       .then(async res => {
         // Reset templateinputs collection before assertion
         // to prevent duplicate key
-        await testTemplateInput.remove({});
+        await TemplateInput.remove({});
 
         res.should.have.status(200);
         res.body.should.have.property("data").that.is.an("object");
@@ -132,7 +135,7 @@ describe(`POST ${path}`, () => {
     db.disconnect();
   });
 
-  beforeEach(async () => await testTemplate.remove());
+  beforeEach(async () => await Template.remove({}));
 
   /**
    * ******************
