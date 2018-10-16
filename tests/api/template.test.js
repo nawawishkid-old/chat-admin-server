@@ -1,6 +1,7 @@
 const app = require("./app");
 const { chai, should } = require("./utils");
-const { testUser, testTemplate, testTemplateInput } = require("../utils").models;
+const { db, models } = require("../utils");
+const { testUser, testTemplate, testTemplateInput } = models;
 const path = "/api/template";
 let accessToken, userId;
 const requestAccessToken = async () => {
@@ -33,12 +34,19 @@ const createTemplate = async () => {
   });
 };
 
+/**
+ * Test cases
+ */
 describe(`GET ${path}/:id?`, () => {
   before(async () => {
+    await db.connect();
     await requestAccessToken();
   });
 
-  after(async () => await testUser.remove());
+  after(async () => {
+    await db.reset();
+    db.disconnect();
+  });
 
   it("responds with 404 code when there is no template", done => {
     chai
@@ -104,20 +112,27 @@ describe(`GET ${path}/:id?`, () => {
       .request(app)
       .get(`${path}/${templateId}`)
       .set("Authorization", "Bearer " + accessToken)
-      .then(async res => {
-        await testTemplateInput.remove();
-
+      .then(res => {
         res.should.have.status(200);
         res.body.should.have.property("data").that.is.an("object");
-        res.body.data.should.have.property("templates").that.is.an("array");
-        res.body.data.templates.length.should.eql(1);
-        res.body.data.templates[0].should.have.property("creatorId", userId);
+        res.body.data.should.have.property("template").that.is.an("object");
+        res.body.data.template.should.have.property("creatorId", userId);
       });
   });
 });
 
 describe(`POST ${path}`, () => {
-  afterEach(async () => await testTemplate.remove());
+  before(async () => {
+    await db.connect();
+    await requestAccessToken();
+  });
+
+  after(async () => {
+    await db.reset();
+    db.disconnect();
+  });
+
+  beforeEach(async () => await testTemplate.remove());
 
   /**
    * ******************

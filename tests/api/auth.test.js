@@ -1,13 +1,21 @@
 const app = require("./app");
 const { chai, should } = require("./utils");
-const { testUser } = require("../utils").models;
+const { db, models } = require("../utils");
+const { testUser } = models;
 
 describe("POST auth/token", function() {
   this.timeout(5000);
 
-  before(async () => await testUser.create());
+  before(async () => {
+    await db.connect();
+    await testUser.create();
+  });
 
-  after(async () => await testUser.remove());
+  after(async () => {
+    await db.reset();
+
+    db.disconnect();
+  });
 
   it("should return access token when received valid credential", done => {
     chai
