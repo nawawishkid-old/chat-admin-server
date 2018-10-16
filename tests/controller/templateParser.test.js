@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const {
   should,
   makeRequest,
@@ -51,7 +52,8 @@ describe(`${prefix} get()`, () => {
     status: 200,
     message: "Template parsed",
     name: {
-      condition: "valid data given",
+      condition:
+        "template ID given, as request path parameters, with/without template parameter as request URL query",
       data: "parsed template"
     },
     request: store => {
@@ -76,6 +78,48 @@ describe(`${prefix} get()`, () => {
         "parsedContent",
         "Hello, " + store.query.name
       );
+    })
+  );
+
+  testCase = createTestCase({
+    controller: ctrl.get,
+    status: 404,
+    message: "Template not found",
+    name: {
+      condition: "given template ID does not match any existing template"
+    },
+    request: {
+      params: { templateId: mongoose.Types.ObjectId() },
+      body: { creatorId: mongoose.Types.ObjectId() }
+    }
+  });
+
+  it(testCase.name, testCase.getCallback());
+
+  testCase = createTestCase({
+    controller: ctrl.get,
+    status: 422,
+    message: "Parsed template is incomplete",
+    name: {
+      condition:
+        "given template arguments are not enough to completely parse template",
+      data:
+        "incompletely-parsed template and object of required template argument"
+    },
+    request: store => ({
+      // No query given
+      params: { templateId },
+      body: { creatorId: userId }
+    })
+  });
+
+  it(
+    testCase.name,
+    testCase.getCallback(res => {
+      const { required } = getBody(res).data;
+
+      should.exist(required);
+      required.should.be.an("object");
     })
   );
 });
