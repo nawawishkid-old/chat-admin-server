@@ -51,6 +51,7 @@ exports.update = async (req, res) => {
     creatorId: req.body.creatorId
   };
 
+	// Prevent updating creatorId
   delete req.body.creatorId;
 
   /**
