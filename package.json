@@ -17,16 +17,17 @@
     "jest": "^23.4.2",
     "mocha": "^5.2.0",
     "node-mocks-http": "^1.7.3",
-    "nyc": "^13.1.0"
+    "nyc": "^13.1.0",
+    "supertest": "^3.3.0"
   },
   "scripts": {
     "dev": "node src/server.js",
-    "test": "mocha -C --recursive tests",
-    "test-api": "mocha -C tests/api",
+    "test": "mocha -C --recursive tests/*/*.test.js",
+    "test-api": "mocha -C tests/api/*.test.js",
     "test-middleware": "mocha -C tests/middleware/*.test.js",
     "test-controller": "mocha -C tests/controller/*.test.js",
-    "test-db": "mocha -C tests/database",
-    "test-module": "mocha -C tests/module",
+    "test-db": "mocha -C tests/database/*.test.js",
+    "test-module": "mocha -C tests/module/*.test.js",
     "cover": "nyc npm run test",
     "cover-api": "nyc npm run test-api",
     "cover-db": "nyc npm run test-db",
