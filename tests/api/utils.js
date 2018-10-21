@@ -1,10 +1,33 @@
+const app = require("./app");
 const chai = require("chai");
-const chaiHttp = require("chai-http");
 const should = chai.should();
+const supertest = require("supertest");
+const ApiTest = require("./ApiTest");
 
-chai.use(chaiHttp);
+const request = () => supertest(app);
+const apiTest = (request = null) => {
+  const arg = request ? request : supertest(app);
+
+  return new ApiTest(arg);
+};
+
+const requestAccessToken = async () => {
+  const { testUser } = require("../models");
+
+  // Get access token
+  return await request()
+    .post("/auth/token")
+    .send({
+      username: testUser.data.username,
+      password: testUser.data.password
+    })
+    .then(res => res.body.token);
+};
 
 module.exports = Object.freeze({
   chai,
-  should
+  should,
+  request,
+  apiTest,
+  requestAccessToken
 });
