@@ -1,12 +1,10 @@
-const app = require("./app");
-const { chai, should } = require("./utils");
+const { apiTest, should } = require("./utils");
 const { db, models } = require("../utils");
 const { testUser } = models;
 const User = require("../../src/models/User");
+const path = "/auth/token";
 
-describe("POST auth/token", function() {
-  this.timeout(5000);
-
+describe(`POST ${path}`, function() {
   before(async () => {
     await db.connect();
     await User.create(testUser.data);
@@ -18,64 +16,48 @@ describe("POST auth/token", function() {
     db.disconnect();
   });
 
-  it("should return access token when received valid credential", done => {
-    chai
-      .request(app)
-      .post("/auth/token")
-      .send({
-        username: testUser.data.username,
-        password: testUser.data.password
-      })
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.have.property(
-          "msg",
-          "Access token issued successfully"
-        );
-        res.body.should.have.property("token").that.is.a("string");
+  apiTest()
+    .endpoint("post", path)
+    .send({
+      username: testUser.data.username,
+      password: testUser.data.password
+    })
+    .expecttt(200, "Access token issued successfully", (err, res, done) => {
+      res.body.should.have.property("token").that.is.a("string");
 
-        done();
-      });
-  });
+      done();
+    })
+    .with("access token")
+    .when("valid credential given")
+    .it();
 
-  it("should not return access token when receive invalid credential", done => {
-    chai
-      .request(app)
-      .post("/auth/token")
-      .send({ username: "ahhaha", password: "hahaha" })
-      .end((err, res) => {
-        res.should.have.status(401);
-        res.body.should.have.property("msg", "Unauthenticated");
-        res.body.should.not.have.property("token");
+  apiTest()
+    .endpoint("post", path)
+    .send({ username: "ahhaha", password: "hahaha" })
+    .expecttt(401, "Unauthenticated", (err, res, done) => {
+      res.body.should.not.have.property("token");
 
-        done();
-      });
-  });
+      done();
+    })
+    .when("invalid credential given")
+    .it();
 
-  it("should not return access token when user exists but password mismatched", done => {
-    chai
-      .request(app)
-      .post("/auth/token")
-      .send({ username: testUser.data.username, password: 1234 })
-      .end((err, res) => {
-        res.should.have.status(401);
-        res.body.should.not.have.property("token");
+  apiTest()
+    .endpoint("post", path)
+    .send({ username: testUser.data.username, password: 1234 })
+    .expecttt(401, "Unauthenticated", (err, res, done) => {
+      res.body.should.not.have.property("token");
 
-        done();
-      });
-  });
+      done();
+    })
+    .when("user exists but password is invalid")
+    .it();
 
-  it("should inform client when no credential received", done => {
-    chai
-      .request(app)
-      .post("/auth/token")
-      .end((err, res) => {
-        res.should.have.status(422);
-        res.body.should.have.property("msg", "Required username and password");
-
-        done();
-      });
-  });
+  apiTest()
+    .endpoint("post", path)
+    .expecttt(422, "Required username and password")
+    .when("no credential given")
+    .it();
 
   /**
    * It should not authenticate when the token is not expired, but its subject (user) has been removed
