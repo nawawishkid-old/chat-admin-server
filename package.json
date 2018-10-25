@@ -9,6 +9,7 @@
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.2.7",
     "password-hash": "^1.2.2",
+    "redis": "^2.8.0",
     "winston": "^3.0.0"
   },
   "devDependencies": {
@@ -21,7 +22,7 @@
     "supertest": "^3.3.0"
   },
   "scripts": {
-		"start": "node src/server.js",
+    "start": "node src/server.js",
     "test": "mocha -C --recursive tests/*/*.test.js",
     "test-api": "mocha -C tests/api/*.test.js",
     "test-middleware": "mocha -C tests/middleware/*.test.js",

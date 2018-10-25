@@ -43,14 +43,15 @@ const getPasswordGrantTypeHandler = options => async (req, res) => {
     if (!isPasswordMatched(res, password, doc.password)) {
       return;
     }
-
-    signToken(res, doc._id, secret, accessTokenLifespan);
+    
+		signToken(res, doc._id, secret, accessTokenLifespan);
   };
 
   await User.findOne({ username })
     .select("+password")
     .then(handleThen)
     .catch(err => {
+			console.log('user error', err)
       handleUnauthenticated(res, { msg: "Unauthenticated", err });
     });
 };
