@@ -3,38 +3,71 @@ const prefix = require("./utils").prefix + "[Auth]";
 const { getAccessToken } = require("../../src/controllers/auth");
 const { testUser } = require("../utils").models;
 const User = require("../../src/models/User");
-const tokenLifespan = 60;
+const accessTokenLifespan = 10;
+const refreshTimeout = 3;
 const secret = "secret";
-const controller = getAccessToken({ tokenLifespan, secret });
+const controller = getAccessToken({
+  refreshTimeout,
+  accessTokenLifespan,
+  secret
+});
 
-describe(`${prefix} getAccessToken()()`, () => {
+describe(`${prefix} getAccessToken()() (common)`, () => {
   before(async () => {
     await db.connect();
   });
 
-  after(() => {
+  after(async () => {
+    await db.reset();
+
     db.disconnect();
   });
 
-  it("should responds with 200 and body.token when given username and password is valid", async () => {
-    const user = await User.create(testUser.data).then(doc => doc);
+  beforeEach(async () => await db.reset());
+
+  it("should responds with 422 if no grant type given in request body", async () => {
+    const req = makeRequest();
+    const res = makeResponse();
+
+    await controller(req, res);
+
+    const body = getBody(res);
+
+    res.should.have.property("statusCode", 422);
+    body.should.have.property("msg", "Required grant type");
+  });
+
+  it("should responds with 422 and an array of expected grant types if invalid grant type given in request body", async () => {
     const req = makeRequest({
-      body: { username: user.username, password: testUser.data.password }
+      body: { grantType: "this is invalid" }
     });
     const res = makeResponse();
 
     await controller(req, res);
-    await User.remove({});
 
     const body = getBody(res);
 
-    res.should.have.property("statusCode", 200);
-    body.should.have.property("msg", "Access token issued successfully");
-    body.should.have.property("token").that.is.a("string");
+    res.should.have.property("statusCode", 422);
+    body.should.have.property("msg", "Invalid grant type");
+    body.should.have.property("expected").that.is.an("array");
+  });
+});
+
+describe(`${prefix} getAccessToken()() (grantType: password)`, () => {
+  before(async () => {
+    await db.connect();
   });
 
-  it("should responds with 422 when no username and password given", async () => {
-    const req = makeRequest();
+  after(async () => {
+    await db.reset();
+
+    db.disconnect();
+  });
+
+  beforeEach(async () => await db.reset());
+
+  it("should responds with 422 if no username and password given in request body", async () => {
+    const req = makeRequest({ body: { grantType: "password" } });
     const res = makeResponse();
 
     await controller(req, res);
@@ -45,9 +78,13 @@ describe(`${prefix} getAccessToken()()`, () => {
     body.should.have.property("msg", "Required username and password");
   });
 
-  it("should responds with 401 when given username does not exist", async () => {
+  it("should responds with 401 when given username does not exists", async () => {
     const req = makeRequest({
-      body: { username: "fakeUsername", password: "fakePassword" }
+      body: {
+        grantType: "password",
+        username: "fakeUsername",
+        password: "fakePassword"
+      }
     });
     const res = makeResponse();
 
@@ -62,7 +99,11 @@ describe(`${prefix} getAccessToken()()`, () => {
   it("should responds with 401 when given username exists but password is incorrect", async () => {
     const user = await User.create(testUser.data).then(doc => doc);
     const req = makeRequest({
-      body: { username: user.username, password: "fakePassword" }
+      body: {
+        grantType: "password",
+        username: user.username,
+        password: "fakePassword"
+      }
     });
     const res = makeResponse();
 
@@ -73,5 +114,161 @@ describe(`${prefix} getAccessToken()()`, () => {
 
     res.should.have.property("statusCode", 401);
     body.should.have.property("msg", "Unauthenticated");
+  });
+
+  it("should responds with 200 and body.token when given username and password is valid", async () => {
+    const user = await User.create(testUser.data).then(doc => doc);
+    const req = makeRequest({
+      body: {
+        grantType: "password",
+        username: user.username,
+        password: testUser.data.password
+      }
+    });
+    const res = makeResponse();
+
+    await controller(req, res);
+    await User.remove({});
+
+    const body = getBody(res);
+
+    res.should.have.property("statusCode", 200);
+    body.should.have.property("msg", "Access token issued successfully");
+    body.should.have.property("accessToken").that.is.a("string");
+  });
+});
+
+describe(`${prefix} getAccessToken()() (grantType: refresh)`, () => {
+  before(async () => {
+    await db.connect();
+  });
+
+  after(async () => {
+    await db.reset();
+
+    db.disconnect();
+  });
+
+  beforeEach(async () => await db.reset());
+
+  it("should responds with 422 if no refresh token given in request body", async () => {
+    const req = makeRequest({
+      body: {
+        grantType: "refresh"
+      }
+    });
+    const res = makeResponse();
+
+    await controller(req, res);
+
+    const body = getBody(res);
+
+    res.should.have.property("statusCode", 422);
+    body.should.have.property("msg", "Required refresh token");
+  });
+
+  it("should responds with 401 if invalid refresh token given", async () => {
+    const req = makeRequest({
+      body: {
+        grantType: "refresh",
+        refreshToken: 10789909453234
+      }
+    });
+    const res = makeResponse();
+
+    await controller(req, res);
+
+    const body = getBody(res);
+
+    res.should.have.property("statusCode", 401);
+    body.should.have.property("msg", "Invalid refresh token");
+  });
+
+  it("should responds with 401 if expired refresh token given", async function() {
+    // extends test timeout
+    this.timeout(5000);
+
+    // 1) request new access token using username and password
+    const user = await User.create(testUser.data).then(doc => doc);
+    const req1 = makeRequest({
+      body: {
+        grantType: "password",
+        username: user.username,
+        password: testUser.data.password
+      }
+    });
+    const res1 = makeResponse();
+    const refreshTimeout = 1;
+    const accessTokenLifespan = 1;
+    const newController = getAccessToken({
+      refreshTimeout,
+      accessTokenLifespan,
+      secret
+    });
+
+    await newController(req1, res1);
+
+    const { accessToken } = getBody(res1);
+    // waiting for access token (or refresh token in this case) to be expired
+    const awaitTime = (accessTokenLifespan + refreshTimeout) * 1000;
+    console.log(`\n\twaiting ${awaitTime} milliseconds...\n`);
+    await new Promise(resolve => setTimeout(resolve, awaitTime));
+
+    // 2) request new access token using previous access token
+    const req2 = makeRequest({
+      body: {
+        grantType: "refresh",
+        refreshToken: accessToken
+      }
+    });
+    const res2 = makeResponse();
+
+    await newController(req2, res2);
+
+    const body = getBody(res2);
+
+    res2.should.have.property("statusCode", 401);
+    body.should.have.property("msg", "Refresh token expired");
+  });
+
+  it("should responds with 200 and new access token if a request is made before refresh timeout", async function() {
+    // 1) request new access token using username and password
+    const user = await User.create(testUser.data).then(doc => doc);
+    const req1 = makeRequest({
+      body: {
+        grantType: "password",
+        username: user.username,
+        password: testUser.data.password
+      }
+    });
+    const res1 = makeResponse();
+    const refreshTimeout = 1;
+    const accessTokenLifespan = 1;
+    const newController = getAccessToken({
+      refreshTimeout,
+      accessTokenLifespan,
+      secret
+    });
+
+    await newController(req1, res1);
+
+    const { accessToken } = getBody(res1);
+
+    // 2) request new access token using previous access token
+    const req2 = makeRequest({
+      body: {
+        grantType: "refresh",
+        refreshToken: accessToken
+      }
+    });
+    const res2 = makeResponse();
+
+    await newController(req2, res2);
+
+    const body = getBody(res2);
+
+    res2.should.have.property("statusCode", 200);
+    body.should.have.property("msg", "Access token issued successfully");
+    body.should.have.property("accessToken").that.is.a("string");
   });
 });
