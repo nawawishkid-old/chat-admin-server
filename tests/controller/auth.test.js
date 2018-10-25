@@ -209,9 +209,11 @@ describe(`${prefix} getAccessToken()() (grantType: refresh)`, () => {
     await newController(req1, res1);
 
     const { accessToken } = getBody(res1);
-    // waiting for access token (or refresh token in this case) to be expired
+    // waiting for access token (or refresh token in this case) and refresh timeout to be expired
     const awaitTime = (accessTokenLifespan + refreshTimeout) * 1000;
+
     console.log(`\n\twaiting ${awaitTime} milliseconds...\n`);
+
     await new Promise(resolve => setTimeout(resolve, awaitTime));
 
     // 2) request new access token using previous access token
@@ -231,7 +233,57 @@ describe(`${prefix} getAccessToken()() (grantType: refresh)`, () => {
     body.should.have.property("msg", "Refresh token expired");
   });
 
-  it("should responds with 200 and new access token if a request is made before refresh timeout", async function() {
+  it("should responds with 200 and new access token if given token is expired but its refresh timeout still in time", async function() {
+    // extends test timeout
+    this.timeout(5000);
+
+    // 1) request new access token using username and password
+    const user = await User.create(testUser.data).then(doc => doc);
+    const req1 = makeRequest({
+      body: {
+        grantType: "password",
+        username: user.username,
+        password: testUser.data.password
+      }
+    });
+    const res1 = makeResponse();
+    const refreshTimeout = 1;
+    const accessTokenLifespan = 1;
+    const newController = getAccessToken({
+      refreshTimeout,
+      accessTokenLifespan,
+      secret
+    });
+
+    await newController(req1, res1);
+
+    const { accessToken } = getBody(res1);
+    // waiting for access token (or refresh token in this case) to be expired
+    const awaitTime = accessTokenLifespan * 1000;
+
+    console.log(`\n\twaiting ${awaitTime} milliseconds...\n`);
+
+    await new Promise(resolve => setTimeout(resolve, awaitTime));
+
+    // 2) request new access token using previous access token
+    const req2 = makeRequest({
+      body: {
+        grantType: "refresh",
+        refreshToken: accessToken
+      }
+    });
+    const res2 = makeResponse();
+
+    await newController(req2, res2);
+
+    const body = getBody(res2);
+
+    res2.should.have.property("statusCode", 200);
+    body.should.have.property("msg", "Access token issued successfully");
+    body.should.have.property("accessToken").that.is.a("string");
+  });
+
+  it("should responds with 200 and new access token if new access token is requested before expiration time of existing access token", async function() {
     // 1) request new access token using username and password
     const user = await User.create(testUser.data).then(doc => doc);
     const req1 = makeRequest({
