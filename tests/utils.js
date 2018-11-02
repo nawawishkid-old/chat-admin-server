@@ -43,3 +43,43 @@ exports.db = {
     await Promise.all([user, template, templateInput]);
   }
 };
+
+exports.createAccessToken = async options => {
+  // console.log("createAccessToken()");
+  const User = require("../src/models/User");
+  const { testUser } = require("./models");
+  const { getAccessToken } = require("../src/controllers/auth");
+  const user = await User.create(testUser.data).then(doc => doc);
+  const req = exports.makeRequest({
+    body: {
+      grantType: "password",
+      username: user.username,
+      password: testUser.data.password
+    }
+  });
+  const res = exports.makeResponse();
+
+  await getAccessToken(options)(req, res);
+  User.remove({});
+
+  const body = exports.getBody(res);
+
+  return body.accessToken;
+};
+
+exports.revokeAccessToken = async options => {
+  const { getRevocationController } = require("../src/controllers/auth");
+  const { accessToken, secret } = options;
+  const req = exports.makeRequest({
+    body: { accessToken }
+  });
+  const res = exports.makeResponse();
+
+  await getRevocationController({ secret })(req, res);
+};
+
+exports.wait = async awaitTime => {
+  console.log(`\n\twaiting ${awaitTime} milliseconds...\n`);
+
+  await new Promise(resolve => setTimeout(resolve, awaitTime));
+};

@@ -4,7 +4,7 @@ const ctrl = require("../controllers/auth");
 const app = require("../init");
 const getAccessToken = ctrl.getAccessToken({
   secret: app.get("secret"),
-  tokenLifespan: app.get("access token lifespan")
+  accessTokenLifespan: app.get("access token lifespan")
 });
 const router = Router();
 
