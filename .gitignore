@@ -6,3 +6,4 @@
 .env.dev
 /.nyc_output
 *.rdb
+/dump
