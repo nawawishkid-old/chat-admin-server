@@ -1,7 +1,7 @@
 {
   "name": "node",
   "version": "1.0.0",
-  "description": "",
+  "description": "## TODO",
   "main": "index.js",
   "dependencies": {
     "dotenv": "^6.1.0",
@@ -9,6 +9,7 @@
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.2.7",
     "password-hash": "^1.2.2",
+    "redis": "^2.8.0",
     "winston": "^3.0.0"
   },
   "devDependencies": {
@@ -21,7 +22,7 @@
     "supertest": "^3.3.0"
   },
   "scripts": {
-		"start": "node src/server.js",
+    "start": "node src/server.js",
     "test": "mocha -C --recursive tests/*/*.test.js",
     "test-api": "mocha -C tests/api/*.test.js",
     "test-middleware": "mocha -C tests/middleware/*.test.js",
@@ -36,5 +37,18 @@
     "cover-module": "nyc npm run test-module"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nawawishkid/chat-admin-server.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/nawawishkid/chat-admin-server/issues"
+  },
+  "homepage": "https://github.com/nawawishkid/chat-admin-server#readme"
 }

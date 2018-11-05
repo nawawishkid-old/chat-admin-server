@@ -1,4 +1,5 @@
-const { should, prefix, next, makeRequest, getBody } = require("./utils");
+const { should, next, makeRequest, getBody } = require("../utils");
+const { prefix } = require("./utils");
 const removeBaseUrl = require("../../src/middlewares/removeBaseUrl");
 const baseUrl = "/base-url";
 let obj = { isNext: false };

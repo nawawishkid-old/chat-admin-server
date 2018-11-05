@@ -29,7 +29,8 @@ class TestApi extends TestCaseMaker {
     this.code(code).msg(msg);
 
     this.expect(code, (err, res, done) => {
-      if (err) return done(err);
+      // console.log(res.body);
+			if (err) return done(err);
 
       res.body.should.have.property("msg", msg);
 

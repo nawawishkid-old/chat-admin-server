@@ -1,11 +1,11 @@
 const {
   should,
-  prefix,
   next,
   makeRequest,
   makeResponse,
   getBody
-} = require("./utils");
+} = require("../utils");
+const { prefix } = require("./utils");
 const withRequestBodyFilter = require("../../src/middlewares/withRequestBodyFilter");
 const obj = { isNext: false };
 

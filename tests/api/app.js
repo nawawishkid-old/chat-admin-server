@@ -2,7 +2,7 @@ const path = require("path");
 
 // Test environment
 require("dotenv").config({
-  path: path.resolve("tests/api/env")
+  path: path.resolve("tests/env")
 });
 
 // Let chai-http initializes server, we just provide the app.
