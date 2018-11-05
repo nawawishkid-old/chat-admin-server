@@ -1,7 +1,7 @@
 {
   "name": "node",
   "version": "1.0.0",
-  "description": "",
+  "description": "## TODO",
   "main": "index.js",
   "dependencies": {
     "dotenv": "^6.1.0",
@@ -37,5 +37,18 @@
     "cover-module": "nyc npm run test-module"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nawawishkid/chat-admin-server.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/nawawishkid/chat-admin-server/issues"
+  },
+  "homepage": "https://github.com/nawawishkid/chat-admin-server#readme"
 }
