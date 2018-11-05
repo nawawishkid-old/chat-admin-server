@@ -64,7 +64,7 @@ class SupertestProxy extends Middleware {
       this.data.code = args[0];
     }
 
-    this.record("expect", args);
+    this.record("expect", ...args);
 
     return this;
   }
@@ -76,13 +76,13 @@ class SupertestProxy extends Middleware {
 
     this.data.headers[args[0]] = args[1];
 
-    this.record("set", args);
+    this.record("set", ...args);
 
     return this;
   }
 
   send(...args) {
-    this.record("send", args);
+    this.record("send", ...args);
 
     return this;
   }
@@ -105,17 +105,19 @@ class SupertestProxy extends Middleware {
       let record = this.data.records[i];
       let { method, args } = record;
       const isLastRecord = i === this.data.records.length - 1;
-
-      if (isFunction(args)) {
-        args = await args(this.store);
+      // console.log('record: ', record);
+      if (args.length === 1 && isFunction(args[0])) {
+        args = await args[0](this.store);
       }
-
+      // console.log('computed args: ', args);
       if (isLastRecord) {
         args = this.__assignDoneCallback(args);
       }
+
       // console.log("request: ", request);
+      // console.log("record: ", record);
       // console.log("method: ", method);
-      // console.log("args: ", ...args);
+      // console.log("args: ", args);
       request = request[method](...args);
     }
   }
@@ -134,13 +136,15 @@ class SupertestProxy extends Middleware {
     return args;
   }
 
-  record(method, args) {
+  record(method, ...args) {
     // console.log("Nuke.record()");
     if (!this.data.records) {
       this.data.records = [];
     }
 
     const obj = { method, args };
+
+		// console.log('record obj: ', obj);
 
     this.data.records.push(obj);
 
