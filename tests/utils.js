@@ -23,11 +23,12 @@ exports.db = {
   connect: async () => {
     const db = require("../src/modules/database");
 
+		// should be consistent with ./env file
     return await db.connect({
       host: "localhost",
       port: 27017,
-      username: "root",
-      password: "mongodb181409943",
+      username: "admin",
+      password: "admin",
       name: "chatadmin_test",
       authSrc: "admin"
     })();

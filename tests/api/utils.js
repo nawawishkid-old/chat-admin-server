@@ -19,9 +19,10 @@ const requestAccessToken = async () => {
     .post("/auth/token")
     .send({
       username: testUser.data.username,
-      password: testUser.data.password
+      password: testUser.data.password,
+      grantType: "password"
     })
-    .then(res => res.body.token);
+    .then(res => res.body.accessToken);
 };
 
 module.exports = Object.freeze({

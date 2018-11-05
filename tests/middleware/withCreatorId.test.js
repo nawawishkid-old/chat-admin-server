@@ -1,11 +1,11 @@
 const {
   should,
-  prefix,
   next,
-  getBody,
   makeRequest,
-  makeResponse
-} = require("./utils");
+  makeResponse,
+  getBody
+} = require("../utils");
+const { prefix } = require("./utils");
 const withCreatorId = require("../../src/middlewares/withCreatorId");
 const SECRET = "secret";
 let obj = { isNext: false };
@@ -24,7 +24,7 @@ describe(`${prefix}withCreatorId`, () => {
 
     withCreatorId(req, res, next(obj));
 
-		obj.isNext.should.be.true;
+    obj.isNext.should.be.true;
     res.should.not.have.property("statusCode", 401);
     req.body.should.have.property("creatorId", userId);
   });

@@ -24,6 +24,7 @@ describe(`GET ${path}/:id`, () => {
 
   apiTest()
     .endpoint("get", path)
+    .set(() => ["Authorization", accessToken])
     .expect(404)
     .when("user ID is not given in URL path parameter")
     .it();
