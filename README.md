@@ -1,5 +1,7 @@
 # Chat template administration
 
+![travis-ci build result](https://travis-ci.org/nawawishkid/chat-admin-server.svg?branch=master)
+
 ## TODO
 
 - [ ] JWT Revocation.
