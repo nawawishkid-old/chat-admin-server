@@ -3,4 +3,4 @@ node_js:
   - "node"
 services: mongodb
 before_script:
-  - mongo admin --eval 'db.createUser({ user: "admin", pwd: "admin", roles: [{ role: "root", db: "admin" }] })'
+  - mongo admin --eval 'db.createUser({user:"admin",pwd:"admin",roles:["root"]});'
