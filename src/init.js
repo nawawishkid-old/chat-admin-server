@@ -7,6 +7,7 @@ const init = app => {
   app = require("./configs/app")(app);
   app = require("./configs/logger")(app);
   app = require("./configs/db")(app);
+  app = require("./configs/redis")(app);
 
   return app;
 };

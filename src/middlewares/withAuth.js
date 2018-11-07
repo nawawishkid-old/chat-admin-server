@@ -9,6 +9,7 @@
  * You have to implement the requirements above for security reasons.
  */
 module.exports = ({ secret }) => async (req, res, next) => {
+  const app = require("../init");
   const jwt = require("jsonwebtoken");
   const { getTokenFromHttpHeader } = require("./utils");
   const TOKEN = getTokenFromHttpHeader(req.header("Authorization"));
@@ -38,7 +39,10 @@ module.exports = ({ secret }) => async (req, res, next) => {
   /**
    * 2) Check verified token if it is revoked. (connect to Redis DB)
    */
-  const redis = require("redis").createClient();
+  const redis = require("redis").createClient({
+    host: app.get("redis host"),
+    port: app.get("redis port")
+  });
   const { promisify } = require("util");
   const getAsync = promisify(redis.get).bind(redis);
 
