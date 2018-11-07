@@ -2,6 +2,7 @@ version: '3.3'
 
 services:
   nginx:
+    container_name: nginx
     image: nginx
     restart: on-failure
     ports:
@@ -14,11 +15,14 @@ services:
       - ./docker/nginx/log/app.error_log:/var/log/nginx/app.error_log
 
   redis:
+    container_name: redis
     image: redis
     restart: on-failure
 
   mongodb:
+    container_name: mongo
     image: mongo
+    restart: on-failure
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
@@ -27,6 +31,7 @@ services:
     #   - ./docker/mongo/initdb.js:/docker-entrypoint-initdb.d/initdb.js
 
   app:
+    container_name: app
     build:
       context: .
       dockerfile: Dockerfile
@@ -37,4 +42,8 @@ services:
       - mongodb
       - nginx
       - redis
-
+    environment:
+      CHATADMIN_DB_HOST: mongodb
+      CHATADMIN_DB_PASSWORD: admin
+      CHATADMIN_DB_AUTH_SOURCE: admin
+      CHATADMIN_REDIS_HOST: redis
