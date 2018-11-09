@@ -16,8 +16,10 @@ services:
 
   redis:
     container_name: redis
-    image: redis
+    image: bitnami/redis
     restart: on-failure
+    environment:
+      REDIS_PASSWORD: Qn3xLb5jqc?8sd@5Q:d4!U]QaxvT)_cCKPw>DX}rE-B4yu67
 
   mongodb:
     container_name: mongo
@@ -47,3 +49,4 @@ services:
       CHATADMIN_DB_PASSWORD: admin
       CHATADMIN_DB_AUTH_SOURCE: admin
       CHATADMIN_REDIS_HOST: redis
+      CHATADMIN_REDIS_PASSWORD: Qn3xLb5jqc?8sd@5Q:d4!U]QaxvT)_cCKPw>DX}rE-B4yu67
