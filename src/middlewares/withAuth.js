@@ -39,10 +39,7 @@ module.exports = ({ secret }) => async (req, res, next) => {
   /**
    * 2) Check verified token if it is revoked. (connect to Redis DB)
    */
-  const redis = require("redis").createClient({
-    host: app.get("redis host"),
-    port: app.get("redis port")
-  });
+  const redis = require("redis").createClient(app.get("redis options"));
   const { promisify } = require("util");
   const getAsync = promisify(redis.get).bind(redis);
 
