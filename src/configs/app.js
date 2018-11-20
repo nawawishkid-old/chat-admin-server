@@ -56,7 +56,7 @@ module.exports = app => {
 
   app.set("env", env("CHATADMIN_ENV", validateEnv));
   app.set("host", env("CHATADMIN_HOST", "0.0.0.0"));
-  app.set("port", env("CHATADMIN_PORT", 11112));
+  app.set("port", env("CHATADMIN_PORT", 80));
   app.set("base url", env("CHATADMIN_BASE_URL"));
   app.set("log directory", env("CHATADMIN_LOG_DIR", "."));
   app.set("log type", env("CHATADMIN_LOG_TYPE", validateLogType));
