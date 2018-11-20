@@ -6,3 +6,5 @@ services:
   - redis-server
 before_script:
   - mongo admin --eval 'db.createUser({user:"admin",pwd:"admin",roles:["root"]});'
+after_success:
+  - npm run cover
