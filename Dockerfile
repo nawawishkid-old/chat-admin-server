@@ -14,5 +14,5 @@ RUN if [ $ENV = 'PROD' ]; then \
 
 COPY ./src ./src
 
-EXPOSE 11112
+EXPOSE 80 
 CMD [ "npm", "start" ]
